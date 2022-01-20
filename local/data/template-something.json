@@ -1,0 +1,4 @@
+{
+  "httpMethod": "POST",
+  "path": "/v1/whatever/template/1/something"
+}

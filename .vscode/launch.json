@@ -1,0 +1,61 @@
+{
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch Serverless Offline",
+      "program": "${workspaceRoot}/node_modules/serverless/bin/serverless",
+      "args": [
+          "offline",
+          "start"
+      ],
+      "env": {
+        "NODE_ENV": "local",
+        "SERVICE": "cvs-svc-template",
+        "API_VERSION": "1.0.0"
+      },
+      "windows": {
+        "program": "${workspaceRoot}\\node_modules\\serverless\\bin\\serverless"
+      }
+    },
+    {
+      "name": "Jest Debug all tests",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/jest",
+      "cwd": "${workspaceRoot}",
+      "console": "integratedTerminal",
+      "protocol": "inspector",
+      "windows": {
+        "program": "${workspaceRoot}\\node_modules\\.bin\\jest"
+      },
+      "env": {
+        "NODE_ENV": "test",
+        "SERVICE": "cvs-svc-template",
+        "API_VERSION": "1.0.0"
+        // Here we set some environment vars that should be set locally.
+        // They can and will overwrite the ones coming from your serverless.yml
+        // Please refer to the relevant .env files - test for example...
+      }
+    },
+    {
+      "name": "Jest Debug opened file",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/jest",
+      "args": ["${fileBasenameNoExtension}"],
+      "cwd": "${workspaceRoot}",
+      "protocol": "inspector",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "env": {
+        "NODE_ENV": "test",
+        "SERVICE": "cvs-svc-template",
+        "API_VERSION": "1.0.0"
+        // Here we set some environment vars that should be set locally.
+        // They can and will overwrite the ones coming from your serverless.yml
+        // Please refer to the relevant .env files - test for example...
+      }
+    }
+  ]
+}

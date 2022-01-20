@@ -1,0 +1,71 @@
+# https://github.com/serverless/serverless/blob/master/docs/providers/aws/guide/functions.md
+service: cvs-svc-template
+useDotenv: true
+
+# Create an optimized package for our Functions
+# This file has 2 purposes:
+# - used to mock API Gateway so that we can work locally (with serverless-offline)
+# - use webpack to bundle our code
+package:
+  individually: true
+  exclude:
+    - node_modules/**
+    - .build/**
+  include:
+    - src/handler.ts
+
+plugins:
+  # .dotenv is not currently supported so we use this serverless plugin for env configuration
+  - serverless-dotenv-plugin
+  # https://github.com/serverless-heaven/serverless-webpack/tree/master/examples
+  - serverless-webpack
+  # - serverless-dynamodb-local
+  # https://github.com/serverless-heaven/serverless-webpack#usage-with-serverless-offline
+  - serverless-offline
+
+provider:
+  profile: ${env:AWS_PROVIDER_PROFILE, 'default'}
+  name: aws
+  runtime: nodejs14.x
+  apiGateway:
+    # https://www.serverless.com/framework/docs/deprecations/#LOAD_VARIABLES_FROM_ENV_FILES
+    shouldStartNameWithService: true
+  stage: ${env:AWS_PROVIDER_STAGE, 'local'}
+  region: ${env:AWS_PROVIDER_REGION, 'local'}
+  # To load environment variables externally
+  # rename env.example to .env.local
+  # docs: https://github.com/serverless/serverless/blob/master/docs/providers/aws/guide/variables.md
+  # we use dotenv, docs: https://github.com/colynb/serverless-dotenv-plugin
+  environment:
+    SERVICE_VERSION: ${env:API_VERSION}
+    AWS_PROVIDER_REGION: ${self:provider.region}
+    SERVICE: ${self:service}
+
+functions:
+  # Use express routing so we don't rely on APIG and leverage express API
+  app:
+    handler: src/handler.handler
+    events:
+      - http: ANY /
+      # We will proxy version from here in the client to match the API specs e.g. <stage>/**/*/<service>
+      - http: 'ANY /{proxy+}'
+  # Can also define specific functions on exposed routes using pattern matching, see below as example:
+  # handler.ts containing exported getHello function is exposed on path /hello
+  # that you can test locally sls invoke local -f getHello -d '{"path": "hello"}' or with sls offline
+  # getHello:
+  #   handler: src/handler.getHello
+  #   events:
+  #     - http: 'GET /hello'
+custom:
+  dotenv:
+    basePath: './config/'
+  webpack:
+    webpackConfig: './scripts/webpack.config.js'
+    keepOutputDirectory: false
+    # can be toggled depending on env and .env files configuration
+    includeModules: true # Node modules configuration for packaging, TBC whether we need the node_modules or 'inject' them when hosted on S3
+    packager: 'npm' # Packager that will be used to package your external modules
+    excludeFiles: src/**/*.test.js # Provide a glob for files to ignore
+  # https://www.serverless.com/plugins/serverless-offline#usage-with-webpack - See Usage and command line options
+  serverless-offline:
+    httpPort: ${env:AWS_SERVER_PORT, 3001}
