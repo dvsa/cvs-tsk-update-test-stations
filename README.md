@@ -1,4 +1,4 @@
-# cvs-svc-template
+# cvs-tsk-update-test-stations
 
 The template for CVS lambda services
 

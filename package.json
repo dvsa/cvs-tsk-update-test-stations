@@ -1,23 +1,23 @@
 {
-  "name": "cvs-svc-template",
+  "name": "cvs-tsk-update-test-stations",
   "version": "1.0.0",
   "description": "",
-  "main": "src/index.ts",
+  "main": "src/handler.ts",
   "engines": {
     "node": "14.*",
     "npm": "6.*"
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm-run-all security-checks prettier lint",
+      "pre-commit": "npm run security-checks && npm run prettier && npm run lint",
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
-      "pre-push": "npm-run-all build test"
+      "pre-push": "npm run build && npm run test"
     }
   },
   "scripts": {
     "start": "cross-env API_VERSION=${npm_package_version} NODE_ENV=local serverless offline start",
     "dev": "cross-env SLS_DEBUG=* concurrently \"npm start\" \"npm run test:unit:watch\"",
-    "test:unit": "cross-env NODE_ENV=test API_VERSION=${npm_package_version} jest",
+    "test:unit": "cross-env NODE_ENV=test API_VERSION=${npm_package_version} jest --runInBand",
     "test:unit:watch": "npm run test:unit -- --watch",
     "test:unit:coverage": "cross-env npm run test:unit -- --coverage",
     "test-i": "echo 'to be added: launch server' && npm run test:integration",
@@ -34,14 +34,10 @@
     "security-checks": "git secrets --scan && git log -p | scanrepo",
     "clean": "rimraf ./.build ./.artifact ./.serverless ./.webpack ./*.zip",
     "compile": "tsc",
-    "build:dev": "cross-env NODE_ENV=local serverless webpack",
-    "build:production": "source config/.env.production && cross-env NODE_ENV=production webpack -c ./scripts/webpack.config.build.js --env=production",
-    "build": "npm-run-all clean build:dev",
+    "build": "tsc --rootDir ./ --outDir .build --sourceMap false && npm run build:copy && rimraf .build/tests",
+    "build:copy": "find src -type f \\( -name \"*.yml\" -or -name \"*.json\" \\) | cpio -pdm .build && find tests -type f \\( -name \"*.yml\" -or -name \"*.json\" \\)  | cpio -pdm .build",
     "sonar-scanner": "sonar-scanner",
-    "package:create": "cross-env NODE_ENV=local sls package --package .build",
-    "package:prepare": "mv ./.build/app.zip ./.build/build.zip",
-    "package:move": "mv ./.build/build.zip ./${ZIP_NAME}.zip",
-    "package": "npm-run-all clean package:*",
+    "package": "mkdir ${ZIP_NAME} && cp package.json package-lock.json ${ZIP_NAME}/ && cp -r .build/src/* ${ZIP_NAME}/ && cd ${ZIP_NAME} && npm ci --production && rm package.json package-lock.json && zip -qr ../${ZIP_NAME}.zip . && cd .. && rimraf ${ZIP_NAME}",
     "release": "semantic-release",
     "prerelease": "semantic-release --dry-run",
     "dependencies:check": "ncu",
@@ -49,9 +45,11 @@
   },
   "dependencies": {
     "aws-lambda": "1.0.6",
-    "express": "4.17.1",
-    "serverless-http": "2.6.0",
-    "source-map-support": "0.5.19"
+    "aws-sdk": "2.1029.0",
+    "dateformat": "4.6.3",
+    "knex": "0.95.14",
+    "source-map-support": "0.5.19",
+    "winston": "3.3.3"
   },
   "devDependencies": {
     "@commitlint/cli": "14.1.0",
@@ -68,7 +66,6 @@
     "@types/supertest": "2.0.10",
     "@typescript-eslint/eslint-plugin": "5.3.1",
     "@typescript-eslint/parser": "5.3.1",
-    "clean-webpack-plugin": "3.0.0",
     "commitlint-plugin-function-rules": "1.1.20",
     "concurrently": "6.3.0",
     "cross-env": "7.0.3",
@@ -76,35 +73,31 @@
     "eslint-config-prettier": "7.1.0",
     "eslint-plugin-jest": "24.3.2",
     "eslint-plugin-prettier": "3.3.1",
-    "fork-ts-checker-webpack-plugin": "6.0.8",
     "husky": "4.3.7",
     "jest": "27.3.1",
-    "json-serverless": "1.6.16",
     "npm-run-all": "4.1.5",
     "prettier": "2.2.1",
     "rimraf": "3.0.2",
     "semantic-release": "18.0.0",
     "serverless": "2.66.1",
-    "serverless-dotenv-plugin": "3.1.0",
     "serverless-offline": "8.2.0",
-    "serverless-webpack": "5.3.5",
+    "serverless-offline-aws-eventbridge": "1.6.5",
+    "serverless-plugin-typescript": "2.1.0",
     "supertest": "6.0.1",
     "ts-jest": "27.0.7",
     "ts-loader": "8.0.14",
     "ts-node": "9.1.1",
-    "typescript": "4.4.4",
-    "webpack": "5.11.1",
-    "webpack-node-externals": "2.5.2"
+    "typescript": "4.4.4"
   },
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/dvsa/cvs-svc-template/issues"
+    "url": "https://github.com/dvsa/cvs-tsk-update-test-stations/issues"
   },
-  "homepage": "https://github.com/dvsa/cvs-svc-template#readme",
+  "homepage": "https://github.com/dvsa/cvs-tsk-update-test-stations#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/dvsa/cvs-svc-template.git"
+    "url": "https://github.com/dvsa/cvs-tsk-update-test-stations.git"
   },
   "keywords": [
     "DVLA",
