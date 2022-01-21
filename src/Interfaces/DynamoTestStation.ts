@@ -1,16 +1,16 @@
 interface DynamoTestStation {
-  testStationId : string,
-  testStationAddress: string,
-  testStationContactNumber: string,
-  testStationEmails: string,
-  testStationGeneralNotes: string,
-  testStationLongitude: string,
-  testStationLatitude: string,
-  testStationName: string,
-  testStationPNumber: string,
-  testStationPostcode: string,
-  testStationStatus: string,
-  testStationTown: string,
+  testStationId: string
+  testStationAddress: string
+  testStationContactNumber: string
+  testStationEmails: string
+  testStationGeneralNotes: string
+  testStationLongitude: string
+  testStationLatitude: string
+  testStationName: string
+  testStationPNumber: string
+  testStationPostcode: string
+  testStationStatus: string
+  testStationTown: string
   testStationType: string
 }
 
