@@ -1,5 +1,5 @@
 import 'source-map-support/register';
-import { ScheduledEvent, Context, Callback } from 'aws-lambda';
+import { ScheduledEvent } from 'aws-lambda';
 import { sendModifiedTestStations } from './eventbridge/send';
 import logger from './observability/logger';
 import { DynamoTestStation } from './Interfaces/DynamoTestStation';
@@ -18,7 +18,7 @@ console.log(
   `\nRunning Service:\n '${SERVICE}'\n mode: ${NODE_ENV}\n stage: '${AWS_PROVIDER_STAGE}'\n region: '${AWS_PROVIDER_REGION}'\n\n`,
 );
 
-const handler = async (event: ScheduledEvent<EventDetail>, _context: Context, callback: Callback): Promise<void> => {
+const handler = async (event: ScheduledEvent<EventDetail>): Promise<void> => {
   try {
     logger.debug(`Function triggered with '${JSON.stringify(event)}'.`);
 
@@ -39,11 +39,11 @@ const handler = async (event: ScheduledEvent<EventDetail>, _context: Context, ca
     await sendModifiedTestStations(modifiedTestStations);
 
     logger.info('Data processed successfully.');
-    callback(null, 'Data processed successfully.');
+    return;
   } catch (error) {
     logger.info('Data processed unsuccessfully.');
     logger.error('', error);
-    callback(new Error('Data processed unsuccessfully.'));
+    throw new Error('Data processed unsuccessfully.');
   }
 };
 
