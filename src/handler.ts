@@ -1,5 +1,5 @@
 import 'source-map-support/register';
-import { ScheduledEvent } from 'aws-lambda';
+import { ScheduledEvent, Context, Callback } from 'aws-lambda';
 import { sendModifiedTestStations } from './eventbridge/send';
 import logger from './observability/logger';
 import { DynamoTestStation } from './Interfaces/DynamoTestStation';
@@ -8,7 +8,7 @@ const {
   NODE_ENV, SERVICE, AWS_PROVIDER_REGION, AWS_PROVIDER_STAGE,
 } = process.env;
 
-interface EventDetail {
+export interface EventDetail {
   lastModifiedDate: string;
 }
 
@@ -18,33 +18,33 @@ console.log(
   `\nRunning Service:\n '${SERVICE}'\n mode: ${NODE_ENV}\n stage: '${AWS_PROVIDER_STAGE}'\n region: '${AWS_PROVIDER_REGION}'\n\n`,
 );
 
-const handler = async (event: ScheduledEvent<EventDetail>): Promise<void> => {
-  try {
-    logger.debug(`Function triggered with '${JSON.stringify(event)}'.`);
+const handler = (event: ScheduledEvent<EventDetail>, _context: Context, callback: Callback): void => {
+  logger.debug(`Function triggered with '${JSON.stringify(event)}'.`);
 
-    let lastModifiedDate: Date;
-    if (event?.detail?.lastModifiedDate) {
-      lastModifiedDate = getDateFromManualTrigger(event.detail.lastModifiedDate);
-    } else {
-      const now = new Date(Date.now());
-      lastModifiedDate = new Date(now.setDate(now.getDate() - ONE_DAY));
-    }
-
-    // TODO: replace with response from Dynamics
-    // const modifiedTestStations = await getModifiedTestStations(lastModifiedDate);
-    if (lastModifiedDate === new Date(Date.now())) {
-      return;
-    } // TODO: REMOVE
-    const modifiedTestStations = new Array<DynamoTestStation>();
-    await sendModifiedTestStations(modifiedTestStations);
-
-    logger.info('Data processed successfully.');
-    return;
-  } catch (error) {
-    logger.info('Data processed unsuccessfully.');
-    logger.error('', error);
-    throw new Error('Data processed unsuccessfully.');
+  let lastModifiedDate: Date;
+  if (event?.detail?.lastModifiedDate) {
+    lastModifiedDate = getDateFromManualTrigger(event.detail.lastModifiedDate);
+  } else {
+    const now = new Date(Date.now());
+    lastModifiedDate = new Date(now.setDate(now.getDate() - ONE_DAY));
   }
+
+  // TODO: replace with response from Dynamics
+  // const modifiedTestStations = await getModifiedTestStations(lastModifiedDate);
+  if (lastModifiedDate === new Date(Date.now())) {
+    return;
+  } // TODO: REMOVE
+  const modifiedTestStations = new Array<DynamoTestStation>();
+  sendModifiedTestStations(modifiedTestStations)
+    .then(() => {
+      logger.info('Data processed successfully.');
+      callback(null, 'Data processed successfully.');
+    })
+    .catch((error) => {
+      logger.info('Data processed unsuccessfully.');
+      logger.error('', error);
+      callback(new Error('Data processed unsuccessfully.'));
+    });
 };
 
 function getDateFromManualTrigger(lastModifiedDate: string): Date {

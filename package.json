@@ -32,7 +32,7 @@
     "lint": "npm-run-all lint:*",
     "prettier": "prettier --write ./**/*.{js,ts}",
     "security-checks": "git secrets --scan && git log -p | scanrepo",
-    "clean": "rimraf ./.build ./.artifact ./.serverless ./.webpack ./*.zip",
+    "clean": "rimraf ./.build ./.artifact ./.serverless./*.zip",
     "compile": "tsc",
     "build": "tsc --rootDir ./ --outDir .build --sourceMap false && npm run build:copy && rimraf .build/tests",
     "build:copy": "find src -type f \\( -name \"*.yml\" -or -name \"*.json\" \\) | cpio -pdm .build && find tests -type f \\( -name \"*.yml\" -or -name \"*.json\" \\)  | cpio -pdm .build",
