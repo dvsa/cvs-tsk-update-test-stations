@@ -8,7 +8,9 @@ import { DynamoTestStation } from '../Interfaces/DynamoTestStation';
 const eventbridge = new EventBridge();
 const sendModifiedTestStations = async (testStations: DynamoTestStation[]): Promise<SendResponse> => {
   logger.info('sendModifiedTestStations starting');
-  logger.info(`${testStations.length} test ${testStations.length === 1 ? 'station' : 'stations'} ready to send to eventbridge.`);
+  logger.info(
+    `${testStations.length} test ${testStations.length === 1 ? 'station' : 'stations'} ready to send to eventbridge.`,
+  );
 
   const sendResponse: SendResponse = {
     SuccessCount: 0,

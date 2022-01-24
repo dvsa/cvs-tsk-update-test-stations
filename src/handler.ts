@@ -32,7 +32,9 @@ const handler = async (event: ScheduledEvent<EventDetail>, _context: Context, ca
 
     // TODO: replace with response from Dynamics
     // const modifiedTestStations = await getModifiedTestStations(lastModifiedDate);
-    if (lastModifiedDate === new Date(Date.now())) { return; } // TODO: REMOVE
+    if (lastModifiedDate === new Date(Date.now())) {
+      return;
+    } // TODO: REMOVE
     const modifiedTestStations = new Array<DynamoTestStation>();
     await sendModifiedTestStations(modifiedTestStations);
 

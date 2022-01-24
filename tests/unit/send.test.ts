@@ -54,7 +54,7 @@ describe('Send events', () => {
 
     it('GIVEN an issue with eventbridge WHEN 6 events are sent and 1 fails THEN the failure is in the response.', async () => {
       const mTestStations = Array<DynamoTestStation>(6);
-      const errorDynamoTestStation = <DynamoTestStation><unknown> { testStationId: 'Error', testStationName: 'Error' };
+      const errorDynamoTestStation = <DynamoTestStation>(<unknown>{ testStationId: 'Error', testStationName: 'Error' });
       mTestStations[0] = errorDynamoTestStation;
       const mSendResponse: SendResponse = { SuccessCount: 5, FailCount: 1 };
       await expect(sendModifiedTestStations(mTestStations)).resolves.toEqual(mSendResponse);
