@@ -22,7 +22,7 @@ const config: Config.InitialOptions = {
   coveragePathIgnorePatterns: ['/node_modules/', '/coverage/', '/.build/', '/.serverless/', '/reports/', '/.artifact/'],
   coverageThreshold: {
     global: {
-      branches: 50,
+      branches: 75,
       functions: 80,
       lines: 80,
       statements: 80,
