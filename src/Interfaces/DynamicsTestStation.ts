@@ -1,5 +1,5 @@
 interface DynamicsTestStation {
-  '@odata.etag': string,
+  '@odata.etag': string;
   accountid: string;
   address1_composite: string;
   address1_line1: string;
