@@ -111,10 +111,9 @@ describe('dynamicsWebApi', () => {
     expect(MOCK_FAILURE.config.headers).toEqual({ Authorization: 'Bearer awdawdawdawd' });
     const PROMISE = onRejected(MOCK_FAILURE);
     PROMISE.then(() => null, (error) => {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        expect(error.config.headers).toBe(null);
-      },
-    );
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      expect(error.config.headers).toBe(null);
+    });
   });
 
   test('GIVEN mock axios odata succesful response WHEN called THEN returns array of DynamoTestStation objects', async () => {

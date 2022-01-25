@@ -2,7 +2,7 @@ import 'source-map-support/register';
 import { ScheduledEvent, Context, Callback } from 'aws-lambda';
 import { sendModifiedTestStations } from './eventbridge/send';
 import logger from './observability/logger';
-import { DynamoTestStation } from './Interfaces/DynamoTestStation';
+import { getTestStations } from './crm/getTestStation';
 
 const {
   NODE_ENV, SERVICE, AWS_PROVIDER_REGION, AWS_PROVIDER_STAGE,
@@ -29,17 +29,11 @@ const handler = (event: ScheduledEvent<EventDetail>, _context: Context, callback
     lastModifiedDate = new Date(now.setDate(now.getDate() - ONE_DAY));
   }
 
-  // TODO: replace with response from Dynamics
-  // const modifiedTestStations = await getModifiedTestStations(lastModifiedDate);
-  if (lastModifiedDate === new Date(Date.now())) {
-    return;
-  } // TODO: REMOVE
-  const modifiedTestStations = new Array<DynamoTestStation>();
-  sendModifiedTestStations(modifiedTestStations)
-    .then(() => {
+  getTestStations(lastModifiedDate)
+    .then((testStations) => sendModifiedTestStations(testStations).then(() => {
       logger.info('Data processed successfully.');
       callback(null, 'Data processed successfully.');
-    })
+    }))
     .catch((error) => {
       logger.info('Data processed unsuccessfully.');
       logger.error('', error);
