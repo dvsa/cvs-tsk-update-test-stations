@@ -59,37 +59,40 @@ describe('dynamicsWebApi', () => {
     },
     config: {},
   };
-  const MOCK_RESULT: DynamoTestStation[] = [{
-    testStationId: 'string',
-    testStationAccessNotes: null,
-    testStationAddress: 'Address 1Address 2',
-    testStationContactNumber: 'string',
-    testStationEmails: 'string',
-    testStationGeneralNotes: 'string',
-    testStationLongitude: 'string',
-    testStationLatitude: 'string',
-    testStationName: 'string',
-    testStationPNumber: 'string',
-    testStationPostcode: 'string',
-    testStationStatus: 'Active',
-    testStationTown: 'string',
-    testStationType: 'ATF',
-  }, {
-    testStationId: 'string',
-    testStationAccessNotes: null,
-    testStationAddress: 'Address 1Address 2',
-    testStationContactNumber: 'string',
-    testStationEmails: 'string',
-    testStationGeneralNotes: null,
-    testStationLongitude: 'string',
-    testStationLatitude: 'string',
-    testStationName: 'string',
-    testStationPNumber: 'string',
-    testStationPostcode: 'string',
-    testStationStatus: 'Active',
-    testStationTown: 'string',
-    testStationType: 'ATF',
-  }];
+  const MOCK_RESULT: DynamoTestStation[] = [
+    {
+      testStationId: 'string',
+      testStationAccessNotes: null,
+      testStationAddress: 'Address 1Address 2',
+      testStationContactNumber: 'string',
+      testStationEmails: 'string',
+      testStationGeneralNotes: 'string',
+      testStationLongitude: 'string',
+      testStationLatitude: 'string',
+      testStationName: 'string',
+      testStationPNumber: 'string',
+      testStationPostcode: 'string',
+      testStationStatus: 'Active',
+      testStationTown: 'string',
+      testStationType: 'ATF',
+    },
+    {
+      testStationId: 'string',
+      testStationAccessNotes: null,
+      testStationAddress: 'Address 1Address 2',
+      testStationContactNumber: 'string',
+      testStationEmails: 'string',
+      testStationGeneralNotes: null,
+      testStationLongitude: 'string',
+      testStationLatitude: 'string',
+      testStationName: 'string',
+      testStationPNumber: 'string',
+      testStationPostcode: 'string',
+      testStationStatus: 'Active',
+      testStationTown: 'string',
+      testStationType: 'ATF',
+    },
+  ];
 
   const MOCK_FAILURE: AxiosError = {
     name: '',
@@ -104,13 +107,14 @@ describe('dynamicsWebApi', () => {
     toJSON: () => null,
   };
 
-  test('GIVEN mock axios odata failure response WHEN called THEN returns error that doesn\'t contain Authorization header sent in the initial request', () => {
+  test("GIVEN mock axios odata failure response WHEN called THEN returns error that doesn't contain Authorization header sent in the initial request", () => {
     expect(MOCK_FAILURE.config.headers).toEqual({ Authorization: 'Bearer awdawdawdawd' });
     const PROMISE = onRejected(MOCK_FAILURE);
     PROMISE.then(() => null, (error) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      expect(error.config.headers).toBe(null);
-    });
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        expect(error.config.headers).toBe(null);
+      },
+    );
   });
 
   test('GIVEN mock axios odata succesful response WHEN called THEN returns array of DynamoTestStation objects', async () => {

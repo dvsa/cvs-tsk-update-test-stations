@@ -9,8 +9,7 @@ import { DynamoTestStation, createDynamoTestStation } from '../Interfaces/Dynamo
 
 const onRejected = (error: AxiosError) => {
   // Removes bearer token from being logged in the error
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-  delete error?.config?.headers;
+  delete error.config.headers;
   return Promise.reject(error);
 };
 
@@ -23,7 +22,7 @@ const getTestStationEntities = async (requestUrl: string): Promise<DynamoTestSta
   axios.interceptors.response.use((response) => response, onRejected);
 
   interface ApiFormat {
-    value: DynamicsTestStation[]
+    value: DynamicsTestStation[];
   }
 
   return lastValueFrom(

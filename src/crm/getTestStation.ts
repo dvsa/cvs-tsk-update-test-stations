@@ -26,10 +26,9 @@ export const getTestStations = async (date: Date): Promise<DynamoTestStation[]> 
     minTimeout: Number(process.env.scalingDuration),
   });
 
-  logger.info(
-    `Successfully fetched ${testStationEntries.length} payment informations`,
-    { date: paymentInformationsDate },
-  );
+  logger.info(`Successfully fetched ${testStationEntries.length} payment informations`, {
+    date: paymentInformationsDate,
+  });
 
   return testStationEntries;
 };
