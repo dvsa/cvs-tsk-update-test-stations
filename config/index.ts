@@ -2,7 +2,7 @@ export default {
   crm: {
     ceClientId: process.env.CE_CLIENT_ID || '',
     ceClientSecret: process.env.CE_CLIENT_SECRET || '',
-    ceTenantId: process.env.CE_TENANT_ID || '',
+    ceAuthority: process.env.CE_AUTHORITY || '',
     ceResource: process.env.CE_RESOURCE || '',
     ceAccountUrl: process.env.CE_ACCOUNT_URL || '',
     maxRetryAttempts: process.env.MAX_RETRY_ATTEMPTS || '',

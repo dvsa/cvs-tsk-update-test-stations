@@ -48,7 +48,7 @@ function createDynamoTestStation(obj: DynamicsTestStation): DynamoTestStation {
 
 const onRejected = (error: AxiosError) => {
   // Removes bearer token from being logged in the error
-  delete error.config.headers;
+  delete error?.config?.headers;
   return Promise.reject(error);
 };
 
