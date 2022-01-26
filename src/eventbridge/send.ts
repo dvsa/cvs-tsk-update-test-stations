@@ -3,7 +3,8 @@ import { EventEntry } from './EventEntry';
 import { Entries } from './Entries';
 import { SendResponse } from './SendResponse';
 import logger from '../observability/logger';
-import { DynamoTestStation } from '../Interfaces/DynamoTestStation';
+import { DynamoTestStation } from '../crm/DynamoTestStation';
+import config from '../../config';
 
 const eventbridge = new EventBridge();
 const sendModifiedTestStations = async (testStations: DynamoTestStation[]): Promise<SendResponse> => {
@@ -23,11 +24,11 @@ const sendModifiedTestStations = async (testStations: DynamoTestStation[]): Prom
 
     try {
       const entry: EventEntry = {
-        Source: process.env.AWS_EVENT_BUS_SOURCE,
+        Source: config.aws.eventBusSource,
         // eslint-disable-next-line security/detect-object-injection
         Detail: JSON.stringify(testStations[i]),
         DetailType: 'CVS ATF Test Station',
-        EventBusName: process.env.AWS_EVENT_BUS_NAME,
+        EventBusName: config.aws.eventBusName,
         Time: new Date(),
       };
 

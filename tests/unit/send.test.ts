@@ -3,7 +3,7 @@ import { mocked } from 'ts-jest/utils';
 import { PutEventsResponse, PutEventsRequest, PutEventsResultEntry } from 'aws-sdk/clients/eventbridge';
 import { sendModifiedTestStations } from '../../src/eventbridge/send';
 import { SendResponse } from '../../src/eventbridge/SendResponse';
-import { DynamoTestStation } from '../../src/Interfaces/DynamoTestStation';
+import { DynamoTestStation } from '../../src/crm/DynamoTestStation';
 
 jest.mock('aws-sdk', () => {
   const mEventBridgeInstance = {

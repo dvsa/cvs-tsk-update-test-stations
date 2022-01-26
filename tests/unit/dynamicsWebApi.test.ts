@@ -1,14 +1,35 @@
 import axios from 'axios-observable';
 import { of } from 'rxjs';
 import { AxiosResponse, AxiosError } from 'axios';
-import { getTestStationEntities, onRejected } from '../../src/crm/dynamicsWebApi';
-import { DynamoTestStation } from '../../src/Interfaces/DynamoTestStation';
+import { getTestStationEntities, onRejected, createDynamoTestStation } from '../../src/crm/dynamicsWebApi';
+import { DynamoTestStation } from '../../src/crm/DynamoTestStation';
+import { DynamicsTestStation } from '../../src/crm/DynamicsTestStation';
 
 jest.mock('../../src/crm/getToken', () => ({
   getToken: jest.fn().mockResolvedValueOnce({ value: 'MOCKED_BEARER_TOKEN' }),
 }));
 
 describe('dynamicsWebApi', () => {
+  const MOCK_BAD_DATA: DynamicsTestStation = {
+    '@odata.etag': 'string',
+    accountid: '1234',
+    address1_composite: 'string',
+    address1_line1: 'Address 1',
+    address1_line2: 'Address 2',
+    telephone1: 'string',
+    emailaddress1: 'string',
+    dvsa_openingtimes: 'string',
+    address1_longitude: 'string',
+    address1_latitude: 'string',
+    name: 'string',
+    dvsa_premisecodes: 'string',
+    address1_postalcode: 'string',
+    dvsa_accountstatus: 147160001,
+    address1_city: 'string',
+    dvsa_testfacilitytype: 1471600,
+    modifiedon: '',
+  };
+
   const MOCK_DATA: AxiosResponse = {
     data: {
       value: [
@@ -63,7 +84,7 @@ describe('dynamicsWebApi', () => {
     {
       testStationId: 'string',
       testStationAccessNotes: null,
-      testStationAddress: 'Address 1Address 2',
+      testStationAddress: 'Address 1, Address 2',
       testStationContactNumber: 'string',
       testStationEmails: 'string',
       testStationGeneralNotes: 'string',
@@ -79,7 +100,7 @@ describe('dynamicsWebApi', () => {
     {
       testStationId: 'string',
       testStationAccessNotes: null,
-      testStationAddress: 'Address 1Address 2',
+      testStationAddress: 'Address 1, Address 2',
       testStationContactNumber: 'string',
       testStationEmails: 'string',
       testStationGeneralNotes: null,
@@ -120,5 +141,12 @@ describe('dynamicsWebApi', () => {
     axios.get = jest.fn().mockReturnValueOnce(of(MOCK_DATA));
     const result = await getTestStationEntities('');
     expect(result).toEqual(MOCK_RESULT);
+  });
+
+  test('GIVEN mock axios odata succesful response with invalid testStationPNumber WHEN called THEN throws an error', () => {
+    function throwAnError() {
+      createDynamoTestStation(MOCK_BAD_DATA);
+    }
+    expect(throwAnError).toThrowError(new Error('Invalid enum value provided for test station type field: 1471600 for test station: 1234'));
   });
 });

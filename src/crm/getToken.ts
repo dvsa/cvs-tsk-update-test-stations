@@ -1,15 +1,16 @@
 import msal from '@azure/msal-node';
+import config from '../../config';
 
 export const getToken = async (): Promise<string> => {
   const cca = new msal.ConfidentialClientApplication({
     auth: {
-      clientId: process.env.CE_CLIENT_ID,
-      clientSecret: process.env.CE_SECRET_NAME,
-      authority: process.env.CE_TENANT_ID,
+      clientId: config.crm.ceClientId,
+      clientSecret: config.crm.ceClientSecret,
+      authority: config.crm.ceTenantId,
     },
   });
   const tokenRequest = {
-    scopes: [process.env.CE_RESOURCE],
+    scopes: [config.crm.ceResource],
   };
 
   return (await cca.acquireTokenByClientCredential(tokenRequest)).accessToken;

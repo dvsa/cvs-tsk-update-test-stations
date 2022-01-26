@@ -2,10 +2,11 @@ import pRetry from 'p-retry';
 import dateFormat from 'dateformat';
 import logger from '../observability/logger';
 import { getTestStationEntities } from './dynamicsWebApi';
-import { DynamoTestStation } from '../Interfaces/DynamoTestStation';
+import { DynamoTestStation } from './DynamoTestStation';
+import config from '../../config';
 
 export const getTestStations = async (date: Date): Promise<DynamoTestStation[]> => {
-  const ceUrl = process.env.CE_RESOURCE;
+  const ceUrl = config.crm.ceAccountUrl;
   const paymentInformationsDate: string = dateFormat(date, 'yyyy-mm-dd');
 
   logger.info('Trying to get payment informations', { date: paymentInformationsDate });
@@ -22,8 +23,8 @@ export const getTestStations = async (date: Date): Promise<DynamoTestStation[]> 
     onFailedAttempt: (error) => {
       logger.info(`Attempt ${error.attemptNumber} failed with "${error.message}".`);
     },
-    retries: Number(process.env.maxRetryAttempts),
-    minTimeout: Number(process.env.scalingDuration),
+    retries: Number(config.crm.maxRetryAttempts),
+    minTimeout: Number(config.crm.scalingDuration),
   });
 
   logger.info(`Successfully fetched ${testStationEntries.length} payment informations`, {
