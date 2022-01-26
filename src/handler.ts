@@ -23,10 +23,23 @@ const handler = (event: ScheduledEvent<EventDetail>, _context: Context, callback
 
   let lastModifiedDate: Date;
   if (event?.detail?.lastModifiedDate) {
-    lastModifiedDate = getDateFromManualTrigger(event.detail.lastModifiedDate);
+    try {
+      lastModifiedDate = getDateFromManualTrigger(event.detail.lastModifiedDate);
+    } catch (error) {
+      let message = 'Failed to manually trigger function. Invalid input date is invalid';
+      if (typeof error === 'string') {
+        message = error;
+      } else if (error instanceof Error) {
+        message = error.message;
+      }
+
+      callback(new Error(message));
+      return;
+    }
   } else {
     const now = new Date(Date.now());
-    lastModifiedDate = new Date(now.setDate(now.getDate() - ONE_DAY));
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    lastModifiedDate = new Date(today.setDate(today.getDate() - ONE_DAY));
   }
 
   getTestStations(lastModifiedDate)
@@ -44,7 +57,7 @@ const handler = (event: ScheduledEvent<EventDetail>, _context: Context, callback
 function getDateFromManualTrigger(lastModifiedDate: string): Date {
   const isValidDate = !Number.isNaN(Date.parse(lastModifiedDate));
   if (!isValidDate) {
-    throw new Error(`Failed to manually trigger function. Invalid input date ${lastModifiedDate}`);
+    throw new Error(`Failed to manually trigger function. Invalid input date: ${lastModifiedDate}`);
   }
   return new Date(lastModifiedDate);
 }
