@@ -1,5 +1,5 @@
 import { ConfidentialClientApplication, AuthenticationResult } from '@azure/msal-node';
-import config from '../../config';
+import config from '../config';
 
 export async function getToken() {
   const cca = new ConfidentialClientApplication({

@@ -4,7 +4,7 @@ import { Entries } from './Entries';
 import { SendResponse } from './SendResponse';
 import logger from '../observability/logger';
 import { DynamoTestStation } from '../crm/DynamoTestStation';
-import config from '../../config';
+import config from '../config';
 
 const eventbridge = new EventBridge();
 const sendModifiedTestStations = async (testStations: DynamoTestStation[]): Promise<SendResponse> => {
