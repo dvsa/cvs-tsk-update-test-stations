@@ -44,7 +44,10 @@ describe('retryStrategy', () => {
     config.crm.maxRetryAttempts = '0';
     config.crm.scalingDuration = '100';
     const error1 = new Error('error1!');
-    axios.get = jest.fn().mockReturnValueOnce(throwError(() => error1)).mockReturnValueOnce(of(MOCK_DATA));
+    axios.get = jest
+      .fn()
+      .mockReturnValueOnce(throwError(() => error1))
+      .mockReturnValueOnce(of(MOCK_DATA));
     await expect(getTestStations(new Date())).rejects.toEqual(error1);
   });
 
@@ -52,7 +55,10 @@ describe('retryStrategy', () => {
     config.crm.maxRetryAttempts = '1';
     config.crm.scalingDuration = '100';
     const error1 = new Error('error1!');
-    axios.get = jest.fn().mockReturnValueOnce(throwError(() => error1)).mockReturnValueOnce(of(MOCK_DATA));
+    axios.get = jest
+      .fn()
+      .mockReturnValueOnce(throwError(() => error1))
+      .mockReturnValueOnce(of(MOCK_DATA));
     await expect(getTestStations(new Date())).resolves.toBeTruthy();
   });
 
@@ -61,7 +67,10 @@ describe('retryStrategy', () => {
     config.crm.scalingDuration = '100';
     const error1 = new Error('error1!');
     const error2 = new Error('error2!');
-    axios.get = jest.fn().mockReturnValueOnce(throwError(() => error1)).mockReturnValueOnce(throwError(() => error2));
+    axios.get = jest
+      .fn()
+      .mockReturnValueOnce(throwError(() => error1))
+      .mockReturnValueOnce(throwError(() => error2));
     return expect(getTestStations(new Date())).rejects.toEqual(error2);
   });
 });
@@ -77,6 +86,8 @@ describe('getTestStation', () => {
     axios.get = jest.fn().mockReturnValueOnce(of(MOCK_DATA));
     config.crm.ceAccountUrl = 'http://testapi';
     await getTestStations(new Date('2020-10-21'));
-    expect(spy).toHaveBeenCalledWith('http://testapi/?$select=accountid,address1_composite,name,emailaddress1,dvsa_premisecodes,dvsa_testfacilitytype,dvsa_accountstatus,address1_latitude,address1_longitude,telephone1,dvsa_openingtimes,modifiedon&$filter=modifiedon%20eq%202020-10-21');
+    expect(spy).toHaveBeenCalledWith(
+      'http://testapi/?$select=accountid,address1_composite,name,emailaddress1,dvsa_premisecodes,dvsa_testfacilitytype,dvsa_accountstatus,address1_latitude,address1_longitude,telephone1,dvsa_openingtimes,modifiedon&$filter=modifiedon%20ge%202020-10-21',
+    );
   });
 });
