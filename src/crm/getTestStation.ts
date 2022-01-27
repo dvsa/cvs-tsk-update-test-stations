@@ -7,11 +7,11 @@ import config from '../../config';
 
 export const getTestStations = async (date: Date): Promise<DynamoTestStation[]> => {
   const ceUrl = config.crm.ceAccountUrl;
-  const paymentInformationsDate: string = dateFormat(date, 'yyyy-mm-dd');
+  const modifiedOnDate: string = dateFormat(date, 'yyyy-mm-dd');
 
-  logger.info('Trying to get payment informations', { date: paymentInformationsDate });
+  logger.info(`Trying to get test stations informations modified on: ${modifiedOnDate}`);
 
-  const filteredUrl = `${ceUrl}/?$select=accountid,address1_composite,name,emailaddress1,dvsa_premisecodes,dvsa_testfacilitytype,dvsa_accountstatus,address1_latitude,address1_longitude,telephone1,dvsa_openingtimes,modifiedon&$filter=modifiedon%20eq%20${paymentInformationsDate}`;
+  const filteredUrl = `${ceUrl}/?$select=accountid,address1_composite,name,emailaddress1,dvsa_premisecodes,dvsa_testfacilitytype,dvsa_accountstatus,address1_latitude,address1_longitude,telephone1,dvsa_openingtimes,modifiedon&$filter=modifiedon%20eq%20${modifiedOnDate}`;
 
   const run = async (): Promise<DynamoTestStation[]> => {
     const response = await getTestStationEntities(filteredUrl);
@@ -27,8 +27,8 @@ export const getTestStations = async (date: Date): Promise<DynamoTestStation[]> 
     minTimeout: Number(config.crm.scalingDuration),
   });
 
-  logger.info(`Successfully fetched ${testStationEntries.length} payment informations`, {
-    date: paymentInformationsDate,
+  logger.info(`Successfully fetched ${testStationEntries.length} test stations informations`, {
+    date: modifiedOnDate,
   });
 
   return testStationEntries;
