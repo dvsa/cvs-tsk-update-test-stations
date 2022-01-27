@@ -3,7 +3,7 @@ import dateFormat from 'dateformat';
 import logger from '../observability/logger';
 import { getTestStationEntities } from './dynamicsWebApi';
 import { DynamoTestStation } from './DynamoTestStation';
-import config from '../../config';
+import config from '../config';
 
 export const getTestStations = async (date: Date): Promise<DynamoTestStation[]> => {
   const ceUrl = config.crm.ceAccountUrl;

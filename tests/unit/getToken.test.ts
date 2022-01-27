@@ -1,5 +1,5 @@
 import { ConfidentialClientApplication, AuthenticationResult } from '@azure/msal-node';
-import config from '../../config';
+import config from '../../src/config';
 import { getToken } from '../../src/crm/getToken';
 
 describe('getToken', () => {

@@ -3,7 +3,7 @@ import { throwError, of } from 'rxjs';
 import { AxiosResponse } from '../../node_modules/axios-observable/node_modules/axios/index.d';
 import { getTestStations } from '../../src/crm/getTestStation';
 import * as GetTestStations from '../../src/crm/dynamicsWebApi';
-import config from '../../config';
+import config from '../../src/config';
 
 jest.mock('../../src/crm/getToken', () => ({
   getToken: jest.fn().mockResolvedValue({ value: 'MOCKED_BEARER_TOKEN' }),
