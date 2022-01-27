@@ -1,4 +1,5 @@
 interface DynamicsTestStation {
+  '@odata.etag': string;
   accountid: string;
   address1_composite: string;
   address1_line1: string;
@@ -11,9 +12,10 @@ interface DynamicsTestStation {
   name: string;
   dvsa_premisecodes: string;
   address1_postalcode: string;
-  dvsa_accountstatus: string;
+  dvsa_accountstatus: number;
   address1_city: string;
-  dvsa_testfacilitytype: string;
+  dvsa_testfacilitytype: number;
+  modifiedon: string;
 }
 
 export { DynamicsTestStation };
