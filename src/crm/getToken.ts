@@ -1,11 +1,14 @@
 import { ConfidentialClientApplication, AuthenticationResult } from '@azure/msal-node';
 import config from '../config';
+import { getSecret } from '../utils/index';
 
 export async function getToken() {
+  const clientSecretValue = await getSecret(config.crm.ceClientSecret);
+
   const cca = new ConfidentialClientApplication({
     auth: {
       clientId: config.crm.ceClientId,
-      clientSecret: config.crm.ceClientSecret,
+      clientSecret: clientSecretValue,
       authority: config.crm.ceAuthority,
     },
   });

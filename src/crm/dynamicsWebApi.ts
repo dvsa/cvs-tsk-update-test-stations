@@ -30,8 +30,8 @@ function createDynamoTestStation(obj: DynamicsTestStation): DynamoTestStation {
     throw new Error(
       `Invalid enum value provided for test station type field: ${obj.dvsa_testfacilitytype} for test station: ${obj.accountid}`,
     );
-  } 
-  return { 
+  }
+  return {
     testStationId: obj.accountid,
     testStationAccessNotes: null,
     testStationAddress: `${obj.address1_line1}, ${obj.address1_line2}`,
@@ -46,7 +46,7 @@ function createDynamoTestStation(obj: DynamicsTestStation): DynamoTestStation {
     testStationStatus: TestStationStatus.get(obj.dvsa_accountstatus),
     testStationTown: obj.address1_city,
     testStationType: TestStationType.get(obj.dvsa_testfacilitytype),
-  }
+  };
 }
 
 const onRejected = (error: AxiosError) => {
