@@ -1,13 +1,16 @@
 import axios from 'axios-observable';
 import { throwError, of } from 'rxjs';
+import { mocked } from 'ts-jest/utils';
 import { AxiosResponse } from '../../node_modules/axios-observable/node_modules/axios/index.d';
 import { getTestStations } from '../../src/crm/getTestStation';
 import * as GetTestStations from '../../src/crm/dynamicsWebApi';
 import config from '../../src/config';
+import { getSecret } from '../../src/utils';
 
 jest.mock('../../src/crm/getToken', () => ({
   getToken: jest.fn().mockResolvedValue({ value: 'MOCKED_BEARER_TOKEN' }),
 }));
+jest.mock('../../src/utils/index');
 
 const MOCK_DATA: AxiosResponse = {
   data: {
@@ -40,6 +43,8 @@ const MOCK_DATA: AxiosResponse = {
 };
 
 describe('retryStrategy', () => {
+  mocked(getSecret).mockResolvedValue('P601,P602');
+
   test('GIVEN an odata endpoint WHEN there is a short transient error and no retries THEN the call is not successful.', async () => {
     config.crm.maxRetryAttempts = '0';
     config.crm.scalingDuration = '100';

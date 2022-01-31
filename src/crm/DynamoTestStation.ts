@@ -3,7 +3,7 @@ interface DynamoTestStation {
   testStationAccessNotes: string;
   testStationAddress: string;
   testStationContactNumber: string;
-  testStationEmails: string;
+  testStationEmails: string[];
   testStationGeneralNotes: string;
   testStationLongitude: string;
   testStationLatitude: string;

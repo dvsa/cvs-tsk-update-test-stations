@@ -7,6 +7,7 @@ export default {
     ceAccountUrl: process.env.CE_ACCOUNT_URL || '',
     maxRetryAttempts: process.env.MAX_RETRY_ATTEMPTS || '',
     scalingDuration: process.env.MAX_SCALING_DURATION || '',
+    siteList: process.env.STATION_LIST_SECRET || ''
   },
   aws: {
     eventBusSource: process.env.AWS_EVENT_BUS_SOURCE || '',
