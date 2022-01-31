@@ -155,9 +155,9 @@ describe('dynamicsWebApi', () => {
   test("GIVEN mock axios odata failure response WHEN called THEN returns error that doesn't contain Authorization header sent in the initial request", () => {
     expect(MOCK_FAILURE.config.headers).toEqual({ Authorization: 'Bearer awdawdawdawd' });
     const PROMISE = onRejected(MOCK_FAILURE);
-    PROMISE.then(() => null, (error) => {
+    return PROMISE.then(() => null, (error) => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      expect(error.config.headers).toBe(null);
+      expect(error.config.headers).toBe(undefined);
     });
   });
 
