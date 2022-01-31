@@ -13,7 +13,9 @@ The test stations are queried on their `modifiedon` property; **by default this 
 For example, to update all test stations that have been modified on or since the 1st of December 2021:
 ```json
 {
-  "lastModifiedDate": "2021-12-01"
+  "detail": {
+    "lastModifiedDate": "2021-12-01"
+  }
 }
 ```
 
@@ -24,6 +26,43 @@ The solution design can be found in [Confluence](https://wiki.dvsacloud.uk/displ
 The project runs on node 14.x with typescript. For further details about project dependencies, please refer to the `package.json` file.
 [nvm](https://github.com/nvm-sh/nvm/blob/master/README.md) is used to managed node versions and configuration explicitly done per project using an `.npmrc` file.
 
+## Running the project
+
+Once the dependencies are installed (`npm install`), you will be required to rename the `/config/env.example` file to `.env.local` as we use dotenv files for configuration for local local development for example. Further information about [variables](https://www.serverless.com/framework/docs/providers/aws/guide/variables/) and [environment variables](https://www.serverless.com/framework/docs/environment-variables/) with serverless.
+Please note that multiple `.env` files can be created per environments. Our current development environment is 'local'.
+
+The application runs on port `:3001` by default when no stage is provided.
+
+The service has local environmental variables (please see `env` placeholder file) set locally however should we wish to further extend the service, the environmental variables will need to be ported over to the CI/CD pipeline which currently uses `BRANCH` and `BUCKET`.
+
+### Environments
+
+We use `NODE_ENV` environment variable to set multi-stage builds (region, stages) with the help of dotenv through npm scripts to load the relevant `.env.<NODE_ENV>` file from `./config` folder into the `serverless.yml` file as we don't rely on serverless for deployment.
+If no `NODE_ENV` value is provided when running the scripts, it will default its `NODE_ENV` value to 'development' with the `.env.development` config file.
+
+The defaulted values for 'stage' and 'region' are `'local'`. Please refer to the values provided in the `serverless.yml` file.
+
+The following values can be provided when running the scripts with `NODE_ENV`:
+
+```ts
+// ./config/.env.<NODE_ENV> files
+'local'; // used for local development
+'development'; // used development staging should we wish to require external services
+'test'; // used during test scripts where local services, mocks can be used in conjonction
+```
+
+```ts
+/** Running serverless offline as an example for a specific stage - 'local'.
+* Stage 'local' will be injected in the serverless.yml
+**/
+NODE_ENV=local serverless offline
+
+```
+
+Further details about environment setup can be found in the provided documentation and `env.example` file.
+
+All secrets the secrets are will stored in `AWS Secrets Manager`.
+
 ### Scripts
 
 The following scripts are available, for further information please refer to the project `package.json` file:
@@ -33,6 +72,36 @@ The following scripts are available, for further information please refer to the
 - <b>test</b>: `npm run test` - _execute the unit test suite_
 - <b>build</b>: `npm run build` - _bundle the project for production_
 - <b>production build</b>: `npm run build:production` - _generate the project with bundled libraries, minified, concatenated code_
+
+### Offline
+
+Serverless-offline is used to run the project locally. Please use `npm run dev` script to do so. Go to `http://localhost:3001/local/version` to confirm that everything has loaded correctly, you should see that the version is the same as the version in the `package.json`
+
+The below routes are available as default routes from this scaffolding
+
+```
+(GET) http://localhost:3009/local-stage/version
+(GET) http://localhost:3009/local-stage/*/service-name/
+(POST) http://localhost:3009/local-stage/*/service-name/:id/something
+```
+
+### Lambda locally
+
+Serverless can invoke lambda functions locally which provide a close experience to the real service if you decide not use the offline mode. `events` and `paths` can be found under `/local` folder.
+For further details using lambda locally please refer to the [serverless documentation](https://www.serverless.com/framework/docs/providers/aws/cli-reference/invoke-local/).
+
+### Debugging
+
+Existing configuration to debug the running service has been made available for vscode, please refer to `.vscode/launch.json` file. Serverless offline will be available on port `:4000`. 2 jest configurations are also provided which will allow to run a test or multiple tests.
+Should you wish to change the ports when debugging, please change the config args accordingly.
+
+For further information about debugging, please refer to the following documentation:
+
+- [Run-a-function-locally-on-source-changes](https://github.com/serverless-heaven/serverless-webpack#run-a-function-locally-on-source-changes)
+
+- [VSCode debugging](https://github.com/serverless-heaven/serverless-webpack#vscode-debugging)
+
+- [Debug process section](https://www.serverless.com/plugins/serverless-offline#usage-with-webpack)
 
 ## Testing
 
