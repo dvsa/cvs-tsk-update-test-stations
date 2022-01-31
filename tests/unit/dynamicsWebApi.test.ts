@@ -1,15 +1,20 @@
 import axios from 'axios-observable';
 import { of } from 'rxjs';
+import { mocked } from 'ts-jest/utils';
 import { AxiosResponse, AxiosError } from 'axios';
 import { getTestStationEntities, onRejected, createDynamoTestStation } from '../../src/crm/dynamicsWebApi';
 import { DynamoTestStation } from '../../src/crm/DynamoTestStation';
 import { DynamicsTestStation } from '../../src/crm/DynamicsTestStation';
+import { getSecret } from '../../src/utils';
 
 jest.mock('../../src/crm/getToken', () => ({
   getToken: jest.fn().mockResolvedValueOnce({ value: 'MOCKED_BEARER_TOKEN' }),
 }));
+jest.mock('../../src/utils/index');
 
 describe('dynamicsWebApi', () => {
+  mocked(getSecret).mockResolvedValue('P601,P602');
+
   const MOCK_BAD_DATA: DynamicsTestStation = {
     '@odata.etag': 'string',
     accountid: '1234',
@@ -45,7 +50,7 @@ describe('dynamicsWebApi', () => {
           address1_longitude: 'string',
           address1_latitude: 'string',
           name: 'string',
-          dvsa_premisecodes: 'string',
+          dvsa_premisecodes: 'P601',
           address1_postalcode: 'string',
           dvsa_accountstatus: 147160001,
           address1_city: 'string',
@@ -64,7 +69,26 @@ describe('dynamicsWebApi', () => {
           address1_longitude: 'string',
           address1_latitude: 'string',
           name: 'string',
-          dvsa_premisecodes: 'string',
+          dvsa_premisecodes: 'P602',
+          address1_postalcode: 'string',
+          dvsa_accountstatus: 147160001,
+          address1_city: 'string',
+          dvsa_testfacilitytype: 147160000,
+          modifiedon: '',
+        },
+        {
+          '@odata.etag': 'string',
+          accountid: 'string',
+          address1_composite: 'string',
+          address1_line1: 'Address 1',
+          address1_line2: 'Address 2',
+          telephone1: 'string',
+          emailaddress1: 'string',
+          dvsa_openingtimes: 'string',
+          address1_longitude: 'string',
+          address1_latitude: 'string',
+          name: 'string',
+          dvsa_premisecodes: 'P6012',
           address1_postalcode: 'string',
           dvsa_accountstatus: 147160001,
           address1_city: 'string',
@@ -86,12 +110,12 @@ describe('dynamicsWebApi', () => {
       testStationAccessNotes: null,
       testStationAddress: 'Address 1, Address 2',
       testStationContactNumber: 'string',
-      testStationEmails: 'string',
+      testStationEmails: ['string'],
       testStationGeneralNotes: 'string',
       testStationLongitude: 'string',
       testStationLatitude: 'string',
       testStationName: 'string',
-      testStationPNumber: 'string',
+      testStationPNumber: 'P601',
       testStationPostcode: 'string',
       testStationStatus: 'Active',
       testStationTown: 'string',
@@ -102,12 +126,12 @@ describe('dynamicsWebApi', () => {
       testStationAccessNotes: null,
       testStationAddress: 'Address 1, Address 2',
       testStationContactNumber: 'string',
-      testStationEmails: 'string',
+      testStationEmails: ['string'],
       testStationGeneralNotes: null,
       testStationLongitude: 'string',
       testStationLatitude: 'string',
       testStationName: 'string',
-      testStationPNumber: 'string',
+      testStationPNumber: 'P602',
       testStationPostcode: 'string',
       testStationStatus: 'Active',
       testStationTown: 'string',
@@ -137,9 +161,10 @@ describe('dynamicsWebApi', () => {
     });
   });
 
-  test('GIVEN mock axios odata succesful response WHEN called THEN returns array of DynamoTestStation objects', async () => {
+  test('GIVEN mock axios odata succesful response WHEN called THEN returns array of filtered DynamoTestStation objects', async () => {
     axios.get = jest.fn().mockReturnValueOnce(of(MOCK_DATA));
     const result = await getTestStationEntities('');
+    expect(result.length).toBe(2)
     expect(result).toEqual(MOCK_RESULT);
   });
 

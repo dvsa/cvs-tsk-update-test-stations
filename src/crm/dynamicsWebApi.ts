@@ -5,6 +5,8 @@ import { AxiosError } from 'axios';
 import { getToken } from './getToken';
 import { DynamicsTestStation } from './DynamicsTestStation';
 import { DynamoTestStation } from './DynamoTestStation';
+import { getSecret } from '../utils';
+import config from '../config';
 
 const TestStationType = new Map<number, string>([
   [147160000, 'ATF'],
@@ -36,7 +38,7 @@ function createDynamoTestStation(obj: DynamicsTestStation): DynamoTestStation {
     testStationAccessNotes: null,
     testStationAddress: `${obj.address1_line1}, ${obj.address1_line2}`,
     testStationContactNumber: obj.telephone1,
-    testStationEmails: obj.emailaddress1,
+    testStationEmails: [obj.emailaddress1],
     testStationGeneralNotes: obj.dvsa_openingtimes || null,
     testStationLongitude: obj.address1_longitude,
     testStationLatitude: obj.address1_latitude,
@@ -56,6 +58,7 @@ const onRejected = (error: AxiosError) => {
 };
 
 const getTestStationEntities = async (requestUrl: string): Promise<DynamoTestStation[]> => {
+  const siteList = (await getSecret(config.crm.siteList)).split(',');
   const accessToken = await getToken();
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -70,7 +73,8 @@ const getTestStationEntities = async (requestUrl: string): Promise<DynamoTestSta
   return lastValueFrom(
     axios.get<ApiFormat>(requestUrl).pipe(
       map((data) => data.data),
-      map((data: ApiFormat) => data.value.map((obj) => createDynamoTestStation(obj))),
+      map((data: ApiFormat) => data.value.filter((obj) => siteList.includes(obj.dvsa_premisecodes))),
+      map((data) => data.map((obj) => createDynamoTestStation(obj))),
     ),
   );
 };
