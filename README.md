@@ -149,3 +149,34 @@ type(scope?): subject
 'CHORE(cb2-1234): my commit msg' // will fail
 
 ```
+
+### Code standards
+
+#### Code structure
+
+Domain Drive Design diagram with Interfaces, Application, Domain layers and Infrastructure across the layers.
+
+<p align="center">
+  <img src="./docs/DDD_architecture.jpg" alt="Domain Drive Design diagram with Interfaces, Application, Domain layers and Infrastructure across the layers" >
+</p>
+
+#### Toolings
+
+The code uses [eslint](https://eslint.org/docs/user-guide/getting-started), [typescript clean code standards](https://github.com/labs42io/clean-code-typescript) as well as [SonarQube for static analysis](https://docs.sonarqube.org/latest/).
+SonarQube is available locally, please follow the instructions below if you wish to run the service locally (docker is the preferred approach):
+
+- _Docker_:
+  - Run `docker run -d -p 9000:9000 --name sonarqube sonarqube:latest`
+  - The SonarQube container won't start automatically with your PC. To start it run `docker start sonarqube`
+  - Login with admin/admin - http://localhost:9000 and create a Project with name and key found in `./sonar-project.properties`. There you'll also find instructions for creating and configuring an authentication token.
+  - Run the analysis with `npm run sonar-scanner`
+
+- _Brew_:
+  - Install SonarQube using brew
+  - Change `sonar.host.url` to point to localhost, by default, sonar runs on `http://localhost:9000`
+  - run the sonar server `sonar start`, then perform your analysis `npm run sonar-scanner`
+
+- _Manual_:
+  - Add sonar-scanner in environment variables in your \_profile file add the line: `export PATH=<PATH_TO_SONAR_SCANNER>/sonar-scanner-3.3.0.1492-macosx/bin:$PATH`
+  - Start the SonarQube server: `cd <PATH_TO_SONARQUBE_SERVER>/bin/macosx-universal-64 ./sonar.sh start`
+  - In the microservice folder run the command: `npm run sonar-scanner`
