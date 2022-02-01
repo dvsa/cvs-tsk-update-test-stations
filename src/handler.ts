@@ -43,9 +43,10 @@ const handler = (event: ScheduledEvent<EventDetail>, _context: Context, callback
   }
 
   getTestStations(lastModifiedDate)
-    .then((testStations) => sendModifiedTestStations(testStations).then(() => {
-      logger.info('Data processed successfully.');
-      callback(null, 'Data processed successfully.');
+    .then((testStations) => sendModifiedTestStations(testStations).then((response) => {
+      const message = `Data processed successfully; good: ${response.SuccessCount}, bad: ${response.FailCount}`;
+      logger.info(message);
+      callback(null, message);
     }))
     .catch((error) => {
       logger.info('Data processed unsuccessfully.');
