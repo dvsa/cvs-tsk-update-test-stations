@@ -4,6 +4,7 @@ useDotenv: true
 plugins:
   - serverless-offline
   - serverless-plugin-typescript
+  - serverless-dotenv-plugin
   # - serverless-offline-aws-eventbridge
 
 provider:
@@ -13,7 +14,7 @@ provider:
   stage: ${env:NODE_ENV, 'local'}
   region: ${env:AWS_REGION, 'local'}
   # To load environment variables externally
-  # copy ./.env.example to ./.env.local.
+  # copy ./config/.env.example to ./.env.local.
   environment:
     SERVICE_VERSION: ${env:API_VERSION}
     AWS_REGION: ${self:provider.region}
