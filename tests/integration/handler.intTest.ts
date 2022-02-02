@@ -1,88 +1,99 @@
+import { AxiosResponse } from 'axios';
 import axios from 'axios-observable';
+import { of } from 'rxjs';
 import { handler } from '../../src/handler';
-// import { getSecret } from '../../src/utils';
 
 // mock our config
 const ALLOWED_SITE_LIST = 'SITE-1,SITE-2,SITE-3';
 
-const MOCK_DYNAMICS_RESPONSE = [
-  {
-    '@odata.etag': 'string',
-    accountid: 'string',
-    address1_composite: 'string',
-    address1_line1: 'Address 1',
-    address1_line2: 'Address 2',
-    telephone1: 'string',
-    emailaddress1: 'string',
-    dvsa_openingtimes: 'string',
-    address1_longitude: 'string',
-    address1_latitude: 'string',
-    name: 'string',
-    dvsa_premisecodes: 'SITE-1',
-    address1_postalcode: 'string',
-    dvsa_accountstatus: 147160001,
-    address1_city: 'string',
-    dvsa_testfacilitytype: 147160000,
-    modifiedon: '',
+const MOCK_DYNAMICS_RESPONSE: AxiosResponse = {
+  data: {
+    value: [
+      {
+        '@odata.etag': 'SITE-1 etag',
+        accountid: 'SITE-1-id',
+        address1_composite: 'SITE-1 address composite',
+        address1_line1: 'SITE-1 Address 1',
+        address1_line2: 'SITE-1 Address 2',
+        telephone1: 'SITE-1 telephone',
+        emailaddress1: 'SITE-1 email',
+        dvsa_openingtimes: 'SITE-1 opening times',
+        address1_longitude: '1',
+        address1_latitude: '1',
+        name: 'SITE-1 name',
+        dvsa_premisecodes: 'SITE-1',
+        address1_postalcode: 'SITE-1 postcode',
+        dvsa_accountstatus: 147160001,
+        address1_city: 'SITE-1 city',
+        dvsa_testfacilitytype: 147160000,
+        modifiedon: '2022-02-02',
+      },
+      {
+        '@odata.etag': 'SITE-2 etag',
+        accountid: 'SITE-2-id',
+        address1_composite: 'SITE-2 address composite',
+        address1_line1: 'SITE-2 address 1',
+        address1_line2: 'SITE-2 address 2',
+        telephone1: 'SITE-2 telephone',
+        emailaddress1: 'SITE-2 email',
+        dvsa_openingtimes: 'SITE-2',
+        address1_longitude: '2',
+        address1_latitude: '2',
+        name: 'SITE-2 name',
+        dvsa_premisecodes: 'SITE-2',
+        address1_postalcode: 'SITE-2 postcode',
+        dvsa_accountstatus: 147160001,
+        address1_city: 'SITE-2 city',
+        dvsa_testfacilitytype: 147160000,
+        modifiedon: '',
+      },
+      {
+        '@odata.etag': 'SITE-3 etag',
+        accountid: 'SITE-3-id',
+        address1_composite: 'SITE-3 address composite',
+        address1_line1: 'SITE-3 address 1',
+        address1_line2: 'SITE-3 address 2',
+        telephone1: 'SITE-3 telephone',
+        emailaddress1: 'SITE-3 email',
+        dvsa_openingtimes: 'SITE-3',
+        address1_longitude: '3',
+        address1_latitude: '3',
+        name: 'SITE-3 name',
+        dvsa_premisecodes: 'SITE-3',
+        address1_postalcode: 'SITE-3 postcode',
+        dvsa_accountstatus: 147160001,
+        address1_city: 'SITE-3 city',
+        dvsa_testfacilitytype: 147160000,
+        modifiedon: '',
+      },
+      {
+        '@odata.etag': 'SITE-99 etag',
+        accountid: 'SITE-99-id',
+        address1_composite: 'SITE-99 address composite',
+        address1_line1: 'SITE-99 address 1',
+        address1_line2: 'SITE-99 address 2',
+        telephone1: 'SITE-99 telephone',
+        emailaddress1: 'SITE-99 email',
+        dvsa_openingtimes: 'SITE-99',
+        address1_longitude: '99',
+        address1_latitude: '99',
+        name: 'SITE-99 name',
+        dvsa_premisecodes: 'EXCLUDED-SITE-99',
+        address1_postalcode: 'SITE-99 postcode',
+        dvsa_accountstatus: 147160001,
+        address1_city: 'SITE-99 city',
+        dvsa_testfacilitytype: 147160000,
+        modifiedon: '',
+      },
+    ],
   },
-  {
-    '@odata.etag': 'string',
-    accountid: 'string',
-    address1_composite: 'string',
-    address1_line1: 'Address 1',
-    address1_line2: 'Address 2',
-    telephone1: 'string',
-    emailaddress1: 'string',
-    dvsa_openingtimes: null,
-    address1_longitude: 'string',
-    address1_latitude: 'string',
-    name: 'string',
-    dvsa_premisecodes: 'SITE-2',
-    address1_postalcode: 'string',
-    dvsa_accountstatus: 147160001,
-    address1_city: 'string',
-    dvsa_testfacilitytype: 147160000,
-    modifiedon: '',
+  status: 200,
+  statusText: 'Ok',
+  headers: {
+    Authorization: '',
   },
-  {
-    '@odata.etag': 'string',
-    accountid: 'string',
-    address1_composite: 'string',
-    address1_line1: 'Address 1',
-    address1_line2: 'Address 2',
-    telephone1: 'string',
-    emailaddress1: 'string',
-    dvsa_openingtimes: 'string',
-    address1_longitude: 'string',
-    address1_latitude: 'string',
-    name: 'string',
-    dvsa_premisecodes: 'SITE-3',
-    address1_postalcode: 'string',
-    dvsa_accountstatus: 147160001,
-    address1_city: 'string',
-    dvsa_testfacilitytype: 147160000,
-    modifiedon: '',
-  },
-  {
-    '@odata.etag': 'string',
-    accountid: 'string',
-    address1_composite: 'string',
-    address1_line1: 'Address 1',
-    address1_line2: 'Address 2',
-    telephone1: 'string',
-    emailaddress1: 'string',
-    dvsa_openingtimes: 'string',
-    address1_longitude: 'string',
-    address1_latitude: 'string',
-    name: 'string',
-    dvsa_premisecodes: 'EXCLUDED-SITE-99',
-    address1_postalcode: 'string',
-    dvsa_accountstatus: 147160001,
-    address1_city: 'string',
-    dvsa_testfacilitytype: 147160000,
-    modifiedon: '',
-  },
-];
+  config: {},
+};
 
 // mock the external resources
 // AWS SecretsManager
@@ -106,39 +117,27 @@ jest.mock('@azure/msal-node', () => ({
   })),
 }));
 
-// // Dynamics OData Response (axios)
-axios.get = jest.fn().mockResolvedValue({ data: { value: MOCK_DYNAMICS_RESPONSE } });
+// Dynamics OData Response (axios)
+axios.get = jest.fn().mockReturnValue(of(MOCK_DYNAMICS_RESPONSE));
 
-// jest.mock('../../src/config/index', () => ({
-//   crm: {
-//     ceClientId: '',
-//     ceClientSecret: '',
-//     ceAuthority: '',
-//     ceResource: '',
-//     ceAccountUrl: 'http://localhost:1234/',
-//     maxRetryAttempts: '',
-//     scalingDuration: '',
-//     siteList: '',
-//   },
-//   aws: {
-//     eventBusSource: '',
-//     eventBusName: '',
-//   },
-//   logger: {
-//     logLevel: 'verbose',
-//   },
-// }));
+// MSAL (Azure AD) Token Authentication Request
+jest.mock('@azure/msal-node', () => ({
+  ConfidentialClientApplication: jest.fn().mockImplementation(() => ({
+    acquireTokenByClientCredential: jest.fn().mockResolvedValue({ accessToken: 'OPEN SESAME' }),
+  })),
+}));
 
 describe('Handler integration test', () => {
-  // it('Should mock SecretsManager', async () => {
-  //   const val = await getSecret('foo');
-  //   expect(val).toBe(ALLOWED_SITE_LIST);
-  // });
-  it('GIVEN all external resources are mocked WHEN called THEN the mocked data be transformed and pushed to EventBridge', () => {
+  it('GIVEN all external resources are mocked WHEN called THEN the mocked data be transformed and pushed to EventBridge', async () => {
     const callback = jest.fn();
 
     handler(null, null, callback);
 
-    expect(callback).toHaveBeenCalledWith(1, null, 'Data processed successfully; good: 3, bad: 0');
+    // wait for the async/promises to be resolved
+    // source: https://stackoverflow.com/a/51045733/5662
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    await new Promise(process.nextTick);
+
+    expect(callback).toHaveBeenCalledWith(null, 'Data processed successfully; good: 3, bad: 0');
   });
 });
