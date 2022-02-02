@@ -9,17 +9,17 @@ import { getSecret } from '../utils';
 import config from '../config';
 
 const TestStationType = new Map<number, string>([
-  [147160000, 'ATF'],
-  [147160001, 'IVA & ATF'],
-  [147160002, 'IVA'],
+  [147160000, 'atf'],
+  [147160001, 'iva & atf'],
+  [147160002, 'iva'],
 ]);
 
 const TestStationStatus = new Map<number, string>([
-  [147160000, 'Pending'],
-  [147160001, 'Active'],
-  [147160002, 'Suspended'],
-  [147160003, 'Termination Requested'],
-  [147160004, 'Terminated'],
+  [147160000, 'pending'],
+  [147160001, 'active'],
+  [147160002, 'suspended'],
+  [147160003, 'termination requested'],
+  [147160004, 'terminated'],
 ]);
 
 function createDynamoTestStation(obj: DynamicsTestStation): DynamoTestStation {
