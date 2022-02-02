@@ -21,7 +21,7 @@
     "test:unit:watch": "npm run test:unit -- --watch",
     "test:unit:coverage": "cross-env npm run test:unit -- --coverage",
     "test-i": "echo 'to be added: launch server' && npm run test:integration",
-    "test:integration": "cross-env NODE_ENV=test echo 'integration tests to be added'",
+    "test:integration": "BRANCH=local jest --testMatch=\"**/*.intTest.ts\"",
     "test:integration:watch": "echo 'integration tests --watch to be added'",
     "test:integration:coverage": "cross-env echo 'integration tests coverage to be added'",
     "test": "npm-run-all lint test:unit:coverage test:integration:coverage",
