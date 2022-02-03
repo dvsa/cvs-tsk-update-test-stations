@@ -1,20 +1,16 @@
-/* eslint-disable no-var */
-// no-var is needed because `var` is hoisted during init, as is `jest.mock()`
-// (const and let aren't hoisted), and we need the vars for the jest.mock() init
-// so we can inspect/expect them in the test
 import axios from 'axios-observable';
 import { of } from 'rxjs';
+import MockDate from 'mockdate';
 import { handler } from '../../src/handler';
-import { MOCK_DYNAMICS_RESPONSE } from './data/mock_dynamics_ce_response';
+import { MOCK_DYNAMICS_RESPONSE } from './data/mockDynamicsCeResponse';
+import { GetExpectedEvent } from './data/mockEventBridgeEvents';
 
 // mock our config
 const ALLOWED_SITE_LIST = 'SITE-1,SITE-2,SITE-3';
 
-var mockPutEventsPromise = jest.fn().mockResolvedValue(true);
-var mockPutEvents = jest.fn().mockImplementation(() => ({ promise: mockPutEventsPromise }));
-
 // mock the external resources
 // AWS
+const putEventsFn = jest.fn();
 jest.mock('aws-sdk', () => ({
   SecretsManager: jest.fn().mockImplementation(() => ({
     getSecretValue: jest.fn().mockImplementation(() => ({
@@ -22,10 +18,12 @@ jest.mock('aws-sdk', () => ({
     })),
   })),
   EventBridge: jest.fn().mockImplementation(() => ({
-    putEvents: mockPutEvents,
-    // putEvents: jest.fn().mockImplementation(() => ({
-    //   promise: mockPutEventsPromise,
-    // })),
+    putEvents: jest.fn().mockImplementation((params: unknown) => {
+      putEventsFn(params); // allows us to test the event payload
+      return {
+        promise: jest.fn(),
+      };
+    }),
   })),
 }));
 
@@ -41,10 +39,13 @@ axios.get = jest.fn().mockReturnValue(of(MOCK_DYNAMICS_RESPONSE));
 
 describe('Handler integration test', () => {
   beforeAll(() => {
-
+    MockDate.set(new Date('2022-01-01T12:34:45.000'));
+  });
+  afterAll(() => {
+    MockDate.reset();
   });
 
-  it('GIVEN all external resources are mocked WHEN called THEN the mocked data be transformed and pushed to EventBridge', async () => {
+  it('GIVEN all external resources are mocked WHEN called THEN the mocked data to be transformed and pushed to EventBridge', async () => {
     const callback = jest.fn();
 
     handler(null, null, callback);
@@ -56,9 +57,9 @@ describe('Handler integration test', () => {
 
     expect(callback).toHaveBeenCalledWith(null, 'Data processed successfully; good: 3, bad: 0');
 
-    expect(mockPutEventsPromise).toHaveBeenCalledTimes(3);
-    expect(mockPutEvents).toHaveBeenNthCalledWith(1, { Entries: [] });
-    expect(mockPutEvents).toHaveBeenNthCalledWith(2, { Entries: [] });
-    expect(mockPutEvents).toHaveBeenNthCalledWith(3, { Entries: [] });
+    expect(putEventsFn).toHaveBeenCalledTimes(3);
+    expect(putEventsFn).toHaveBeenNthCalledWith(1, GetExpectedEvent(1));
+    expect(putEventsFn).toHaveBeenNthCalledWith(2, GetExpectedEvent(2));
+    expect(putEventsFn).toHaveBeenNthCalledWith(3, GetExpectedEvent(3));
   });
 });
