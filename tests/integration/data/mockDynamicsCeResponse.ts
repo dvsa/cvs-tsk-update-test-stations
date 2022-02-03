@@ -4,7 +4,7 @@ import { DynamicsTestStation } from '../../../src/crm/DynamicsTestStation';
 export const MOCK_DYNAMICS_RESPONSE: AxiosResponse = {
   data: {
     value: [
-      <DynamicsTestStation> {
+      <DynamicsTestStation>{
         '@odata.etag': 'SITE-1 etag',
         accountid: 'SITE-1-id',
         address1_composite: 'SITE-1 address composite',
@@ -23,7 +23,7 @@ export const MOCK_DYNAMICS_RESPONSE: AxiosResponse = {
         dvsa_testfacilitytype: 147160000,
         modifiedon: '2021-01-01',
       },
-      <DynamicsTestStation> {
+      <DynamicsTestStation>{
         '@odata.etag': 'SITE-2 etag',
         accountid: 'SITE-2-id',
         address1_composite: 'SITE-2 address composite',
@@ -42,7 +42,7 @@ export const MOCK_DYNAMICS_RESPONSE: AxiosResponse = {
         dvsa_testfacilitytype: 147160001,
         modifiedon: '2021-02-02',
       },
-      <DynamicsTestStation> {
+      <DynamicsTestStation>{
         '@odata.etag': 'SITE-3 etag',
         accountid: 'SITE-3-id',
         address1_composite: 'SITE-3 address composite',
@@ -61,7 +61,7 @@ export const MOCK_DYNAMICS_RESPONSE: AxiosResponse = {
         dvsa_testfacilitytype: 147160002,
         modifiedon: '2021-03-03',
       },
-      <DynamicsTestStation> {
+      <DynamicsTestStation>{
         '@odata.etag': 'SITE-99 etag',
         accountid: 'SITE-99-id',
         address1_composite: 'SITE-99 address composite',
