@@ -117,9 +117,9 @@ describe('dynamicsWebApi', () => {
       testStationName: 'string',
       testStationPNumber: 'P601',
       testStationPostcode: 'string',
-      testStationStatus: 'Active',
+      testStationStatus: 'active',
       testStationTown: 'string',
-      testStationType: 'ATF',
+      testStationType: 'atf',
     },
     {
       testStationId: 'string',
@@ -133,9 +133,9 @@ describe('dynamicsWebApi', () => {
       testStationName: 'string',
       testStationPNumber: 'P602',
       testStationPostcode: 'string',
-      testStationStatus: 'Active',
+      testStationStatus: 'active',
       testStationTown: 'string',
-      testStationType: 'ATF',
+      testStationType: 'atf',
     },
   ];
 
@@ -164,7 +164,7 @@ describe('dynamicsWebApi', () => {
   test('GIVEN mock axios odata succesful response WHEN called THEN returns array of filtered DynamoTestStation objects', async () => {
     axios.get = jest.fn().mockReturnValueOnce(of(MOCK_DATA));
     const result = await getTestStationEntities('');
-    expect(result.length).toBe(2)
+    expect(result).toHaveLength(2);
     expect(result).toEqual(MOCK_RESULT);
   });
 
