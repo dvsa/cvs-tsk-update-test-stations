@@ -1,4 +1,7 @@
 /* eslint-disable no-var */
+// no-var is needed because `var` is hoisted during init, as is `jest.mock()`
+// (const and let aren't hoisted), and we need the vars for the jest.mock() init
+// so we can inspect/expect them in the test
 import axios from 'axios-observable';
 import { of } from 'rxjs';
 import { handler } from '../../src/handler';
@@ -12,10 +15,6 @@ var mockPutEvents = jest.fn().mockImplementation(() => ({ promise: mockPutEvents
 
 // mock the external resources
 // AWS
-// const mockPutEvents = jest.fn().mockImplementation(() => ({
-//   promise: jest.fn().mockResolvedValue(true),
-// }));
-
 jest.mock('aws-sdk', () => ({
   SecretsManager: jest.fn().mockImplementation(() => ({
     getSecretValue: jest.fn().mockImplementation(() => ({
