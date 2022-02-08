@@ -90,6 +90,7 @@
     "serverless-dotenv-plugin": "3.12.2",
     "serverless-offline": "8.2.0",
     "serverless-offline-aws-eventbridge": "1.6.5",
+    "serverless-offline-http-mock": "0.0.4",
     "serverless-plugin-typescript": "2.1.0",
     "supertest": "6.0.1",
     "ts-jest": "27.0.7",

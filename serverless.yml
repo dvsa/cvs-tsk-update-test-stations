@@ -2,10 +2,11 @@ service: cvs-tsk-update-test-stations
 useDotenv: true
 
 plugins:
+  - serverless-offline-http-mock
   - serverless-offline
   - serverless-plugin-typescript
   - serverless-dotenv-plugin
-  # - serverless-offline-aws-eventbridge
+  - serverless-offline-aws-eventbridge
 
 provider:
   profile: ${env:AWS_PROVIDER_PROFILE, 'default'}
@@ -31,5 +32,23 @@ functions:
 custom:
   dotenv:
     basePath: './'
+  serverless-offline-http-mock:
+    - hostname: https://secretsmanager.local.amazonaws.com/
+      directory: './tests/integration/mock-services'
+      mocks:
+        - awsSecretsManagerMock.ts
+    # WIP: This is as far as I'd gotten attempting to mock the Azure AD OpenID 2.0 token flow:
+    #  - "Attempt 1 failed with "endpoints_resolution_error: Error: could not resolve endpoints.
+    #    "Please check network and try again. Detail: ClientConfigurationError: untrusted_authority: The provided authority is not a trusted authority.
+    #     Please include this authority in the knownAuthorities config parameter."."
+    # Tested by running `serverless offline` then hitting `http://localhost:3001/local` in the browser
+    - hostname: https://login.microsoftonline.com/
+      directory: './tests/integration/mock-services'
+      mocks:
+        - msAzureAdConfigMock.ts
+    - hostname: https://dynamics-ce.example.odata-source.com/
+      directory: './tests/integration/mock-services'
+      mocks:
+        - msDynamicsCeOdataMock.ts
   serverless-offline:
     httpPort: ${env:AWS_SERVER_PORT, 3001}
