@@ -1,0 +1,65 @@
+import axios from 'axios-observable';
+import { of } from 'rxjs';
+import MockDate from 'mockdate';
+import { handler } from '../../src/handler';
+import { MOCK_DYNAMICS_RESPONSE } from './data/mockDynamicsCeResponse';
+import { GetExpectedEvent } from './data/mockEventBridgeEvents';
+
+// mock our config
+const ALLOWED_SITE_LIST = 'SITE-1,SITE-2,SITE-3';
+
+// mock the external resources
+// AWS
+const putEventsFn = jest.fn();
+jest.mock('aws-sdk', () => ({
+  SecretsManager: jest.fn().mockImplementation(() => ({
+    getSecretValue: jest.fn().mockImplementation(() => ({
+      promise: jest.fn().mockResolvedValue({ SecretString: ALLOWED_SITE_LIST }),
+    })),
+  })),
+  EventBridge: jest.fn().mockImplementation(() => ({
+    putEvents: jest.fn().mockImplementation((params: unknown) => {
+      putEventsFn(params); // allows us to test the event payload
+      return {
+        promise: jest.fn(),
+      };
+    }),
+  })),
+}));
+
+// MSAL (Azure AD) Token Authentication Request
+jest.mock('@azure/msal-node', () => ({
+  ConfidentialClientApplication: jest.fn().mockImplementation(() => ({
+    acquireTokenByClientCredential: jest.fn().mockResolvedValue({ accessToken: 'OPEN SESAME' }),
+  })),
+}));
+
+// Dynamics OData Response (axios)
+axios.get = jest.fn().mockReturnValue(of(MOCK_DYNAMICS_RESPONSE));
+
+describe('Handler integration test', () => {
+  beforeAll(() => {
+    MockDate.set(new Date('2022-01-01T12:34:45.000'));
+  });
+  afterAll(() => {
+    MockDate.reset();
+  });
+
+  it('GIVEN all external resources are mocked WHEN called THEN the mocked data to be transformed and pushed to EventBridge', async () => {
+    const callback = jest.fn();
+
+    handler(null, null, callback);
+
+    // wait for the async/promises to be resolved
+    // source: https://stackoverflow.com/a/51045733/5662
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    await new Promise(process.nextTick);
+
+    expect(callback).toHaveBeenCalledWith(null, 'Data processed successfully; good: 3, bad: 0');
+
+    expect(putEventsFn).toHaveBeenCalledTimes(3);
+    expect(putEventsFn).toHaveBeenNthCalledWith(1, GetExpectedEvent(1));
+    expect(putEventsFn).toHaveBeenNthCalledWith(2, GetExpectedEvent(2));
+    expect(putEventsFn).toHaveBeenNthCalledWith(3, GetExpectedEvent(3));
+  });
+});
