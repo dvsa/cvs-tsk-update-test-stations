@@ -2,7 +2,7 @@ node_modules
 .serverless
 .vscode
 *.config.js
-.webpack
+**/config/*.ts
 **/*.js
 .build,
 jest.config.ts

@@ -1,98 +1,39 @@
-import { APIGatewayEvent, Context } from 'aws-lambda';
-import { handler } from '../../src/handler';
-import * as Utils from '../../src/utils';
-import Version from '../../local/data/version.json';
-import Template from '../../local/data/template-something.json';
-import { SEMVER_REGEX } from '../../src/constants';
+import { ScheduledEvent } from 'aws-lambda';
+import { DynamoTestStation } from '../../src/crm/DynamoTestStation';
+import { getTestStations } from '../../src/crm/getTestStation';
+import { EventDetail, handler } from '../../src/handler';
 
-describe('Application entry', () => {
-  let event: APIGatewayEvent;
-  let context: Context;
-  let majorVersionNumber: string;
+jest.mock('../../src/crm/getTestStation', () => ({
+  getTestStations: jest.fn().mockResolvedValue(new Array<DynamoTestStation>()),
+}));
 
-  beforeEach(() => {
-    event = {} as APIGatewayEvent;
-    context = {} as Context;
-    jest.spyOn(Utils, 'createMajorVersionNumber').mockReturnValue('1');
-    majorVersionNumber = Utils.createMajorVersionNumber('1.0.0');
-  });
-
+describe('Handler', () => {
   afterEach(() => {
-    jest.resetAllMocks().restoreAllMocks();
+    jest.clearAllMocks();
   });
 
-  describe('Handler', () => {
-    it('should call the express wrapper', async () => {
-      event = { body: 'Test Body' } as APIGatewayEvent;
+  it('should use the default last nodified date of {day} -1', () => {
+    const now = new Date(Date.now());
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const expectedDate = new Date(today.setDate(today.getDate() - 1)); // 1: day
+    const event = <ScheduledEvent<EventDetail>><unknown>{};
 
-      const response = await handler(event, context);
-      expect(response.statusCode).toEqual(200);
-      expect(typeof response.body).toBe('string');
-    });
+    handler(event, null, () => {});
+    expect(getTestStations).toHaveBeenCalledWith(expectedDate);
+  });
 
-    describe('when the service is running', () => {
-      describe('without proxy', () => {
-        it("should return a body response when the handler has event with the '/' as path", async () => {
-          event = { httpMethod: 'GET', path: '/' } as APIGatewayEvent;
+  it('should use the date passed in instead of the default {day} -1', () => {
+    const expectedDate = '2022-01-01T00:00:00.000Z';
+    const event = <ScheduledEvent<EventDetail>>(<unknown>{ detail: { lastModifiedDate: expectedDate } });
 
-          const response = await handler(event, context);
-          const parsedBody = JSON.parse(response.body) as { ok: boolean };
+    handler(event, null, () => {});
+    expect(getTestStations).toHaveBeenCalledWith(new Date(expectedDate));
+  });
 
-          expect(parsedBody.ok).toBe(true);
-        });
-      });
-    });
+  it('should error and do nothing if the date passed in is not a date', () => {
+    const event = <ScheduledEvent<EventDetail>>(<unknown>{ detail: { lastModifiedDate: 'this is not a date' } });
 
-    describe('with proxy', () => {
-      describe("on '<path>' or '<version>'", () => {
-        it('should receive the version number from an environmental variable following semver convention', () => {
-          expect(process.env.API_VERSION).toMatch(SEMVER_REGEX);
-        });
-
-        it('should have version number in the API shown as major', () => {
-          expect(majorVersionNumber).toMatch(/^(\d+)$/);
-          expect(majorVersionNumber).not.toMatch(/^(\d+\.)$/);
-        });
-      });
-
-      describe("on '/version' endpoint(s)", () => {
-        it("should call the service/lambda when the path contains '/version' and return the app version following the semver convention", async () => {
-          event = {
-            ...Version,
-          } as APIGatewayEvent;
-
-          const response = await handler(event, context);
-          const parsedResponse = JSON.parse(response.body) as { version: string };
-          // is given when we build the file as API_VERSION from package.json with $npm_package_version
-          // TODO we follow semver for code versioning ATM and only use the major for the API endpoint as v1
-          const { API_VERSION } = process.env;
-
-          expect(response.statusCode).toEqual(200);
-          expect(parsedResponse.version).toBe(API_VERSION);
-        });
-      });
-
-      describe("on /v'x'/template endpoint(s)", () => {
-        it('should call the router endpoint', async () => {
-          event = {
-            ...Template,
-          } as APIGatewayEvent;
-          const { statusCode, body } = await handler(event, context);
-          expect(statusCode).toEqual(200);
-          expect(body).not.toBe(undefined);
-          expect(body).toEqual('ok /id/something');
-        });
-
-        it("should get a '404' if the base path endpoint does not contain the 'SERVICE'", async () => {
-          event = {
-            httpMethod: 'POST',
-            path: '/stage/v1/wrong-service-name/1/something',
-          } as APIGatewayEvent;
-
-          const response = await handler(event, context);
-          expect(response.statusCode).toEqual(404);
-        });
-      });
-    });
+    handler(event, null, () => {});
+    expect(getTestStations).not.toHaveBeenCalled();
   });
 });

@@ -11,16 +11,15 @@
     "outDir": "./.build",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "skipLibCheck": true
   },
   "include": ["./src/**/*.ts", "tests/**/*.ts"],
   "exclude": [
     "node_modules/**/*",
     ".serverless/**/*",
-    ".webpack/**/*",
     ".build/**/*",
     ".artifact/**/*",
-    "_warmup/**/*",
     ".vscode/**/*",
     "reports/**/*"
   ]

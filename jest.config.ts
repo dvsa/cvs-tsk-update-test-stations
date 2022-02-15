@@ -1,8 +1,9 @@
 import type { Config } from '@jest/types';
+import { defaults } from 'jest-config';
 
 // https://jestjs.io/docs/en/configuration.html
 const config: Config.InitialOptions = {
-  moduleFileExtensions: ["ts", "js"],
+  moduleFileExtensions: [...defaults.moduleFileExtensions, 'ts', 'js'],
   // overrides
   // https://kulshekhar.github.io/ts-jest/docs/options
   preset: 'ts-jest',
@@ -13,19 +14,12 @@ const config: Config.InitialOptions = {
     //TODO Add for integration
     '**/?(*.)+(spec|test).[tj]s?(x)',
   ],
+  testPathIgnorePatterns: ['/.build/'],
   collectCoverage: false,
   collectCoverageFrom: ['src/**/*.{js,ts}', '!**/node_modules/**'],
   //TODO Add for integration
   coverageDirectory: 'coverage/unit',
-  coveragePathIgnorePatterns: [
-    '/node_modules/',
-    '/coverage/',
-    '/.webpack/',
-    '/.build/',
-    '/.serverless/',
-    '/reports/',
-    '/.artifact/',
-  ],
+  coveragePathIgnorePatterns: ['/node_modules/', '/coverage/', '/.build/', '/.serverless/', '/reports/', '/.artifact/'],
   coverageThreshold: {
     global: {
       branches: 80,

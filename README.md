@@ -1,21 +1,37 @@
-# cvs-svc-template
+# cvs-tsk-update-test-stations
 
-The template for CVS lambda services
+AWS Lambda function that updates the list of test stations in the ATF Sites DynamoDB from the master list in Dynamics CE.
+
+Designed to be invoked by a timer every night to pick up the previous days changes, but can be invoked manually.
+
+## Description
+
+The function authenticates with Azure AD, and uses the returned token to retrieve the details of test stations that have changed from Dynamics CE using OData. Each updated test station is added to EventBridge as a separate event, and EventBridge is then responsible for invoking the Test Station API to perform the actual update in DynamoDB.
+
+The test stations are queried on their `modifiedon` property; **by default this is midnight yesterday**, but any valid ISO-formatted date can be passed in.
+
+For example, to update all test stations that have been modified on or since the 1st of December 2021:
+```json
+{
+  "detail": {
+    "lastModifiedDate": "2021-12-01"
+  }
+}
+```
+
+The solution design can be found in [Confluence](https://wiki.dvsacloud.uk/display/HVT/Selected+Solution+Detail)
 
 ## Dependencies
 
-The project runs on node 10.x with typescript and serverless framework. For further details about project dependencies, please refer to the `package.json` file.
+The project runs on node 14.x with typescript. For further details about project dependencies, please refer to the `package.json` file.
 [nvm](https://github.com/nvm-sh/nvm/blob/master/README.md) is used to managed node versions and configuration explicitly done per project using an `.npmrc` file.
 
 ## Running the project
 
-Once the dependencies are installed, you will be required to rename the `/config/env.example` file to `.env.local` as we use dotenv files for configuration for local local development for example. Further information about [variables](https://www.serverless.com/framework/docs/providers/aws/guide/variables/) and [environment variables](https://www.serverless.com/framework/docs/environment-variables/) with serverless.
+Once the dependencies are installed (`npm install`), you will be required to rename the `/config/env.example` file to `.env.local` as we use dotenv files for configuration for local local development for example. Further information about [variables](https://www.serverless.com/framework/docs/providers/aws/guide/variables/) and [environment variables](https://www.serverless.com/framework/docs/environment-variables/) with serverless.
 Please note that multiple `.env` files can be created per environments. Our current development environment is 'local'.
 
 The application runs on port `:3001` by default when no stage is provided.
-
-To get started, please change the meta data of your `package.json` and `serverless.yml` file accordingly as well as base api route for your express router.
-The router is currently being mounted in the following file `src/infrastructure/api/index.ts`.
 
 The service has local environmental variables (please see `env` placeholder file) set locally however should we wish to further extend the service, the environmental variables will need to be ported over to the CI/CD pipeline which currently uses `BRANCH` and `BUCKET`.
 
@@ -53,13 +69,13 @@ The following scripts are available, for further information please refer to the
 
 - <b>start</b>: `npm start` - _launch serverless offline service_
 - <b>dev</b>: `npm run dev` - _run in parallel the service and unit tests in_ `--watch` _mode with live reload_.
-- <b>test</b>: `npm t` - _execute the unit test suite_
+- <b>test</b>: `npm run test` - _execute the unit test suite_
 - <b>build</b>: `npm run build` - _bundle the project for production_
 - <b>production build</b>: `npm run build:production` - _generate the project with bundled libraries, minified, concatenated code_
 
 ### Offline
 
-Serverless-offline with webpack is used to run the project locally. Please use `npm run dev` script to do so. Go to `http://localhost:3001/local/version` to confirm that everything has loaded correctly, you should see that the version is the same as the version in the `package.json`
+Serverless-offline is used to run the project locally. Please use `npm run dev` script to do so. Go to `http://localhost:3001/local/version` to confirm that everything has loaded correctly, you should see that the version is the same as the version in the `package.json`
 
 The below routes are available as default routes from this scaffolding
 
@@ -89,20 +105,10 @@ For further information about debugging, please refer to the following documenta
 
 ## Testing
 
-[json-serverless](https://github.com/pharindoko/json-serverless) has been added to the repository should we wish to mock external services during development and can be used in conjunction with the `test` environment.
-
 ### Unit
 
 Jest is used for unit testing.
 Please refer to the [Jest documentation](https://jestjs.io/docs/en/getting-started) for further details.
-
-### Integration
-
-To be added and customised depending on needs, supertest is used but we could be looking at other packages such as nock, ts-mockito, typemoq, wiremock, etc.. or testing (pactjs, hoverfly, mockserver, etc..)
-
-## Infrastructure
-
-<Insert Design>
 
 ### Release
 
@@ -126,12 +132,12 @@ To facilitate the standardisation of the code, a few helpers and tools have been
 
 The projects has multiple hooks configured using [husky](https://github.com/typicode/husky#readme) which will execute the following scripts: `audit`, `lint`, `build`, `test` and format your code with [eslint](https://github.com/typescript-eslint/typescript-eslint#readme) and [prettier](https://github.com/prettier/prettier).
 
-You will be required to install [git-secrets](https://github.com/awslabs/git-secrets) (_brew approach is recommended_) and DVSA [repo-security-scanner](https://github.com/UKHomeOffice/repo-security-scanner) that runs against your git log history to find accidentally committed passwords, private keys.
+You will be required to install [git-secrets](https://github.com/awslabs/git-secrets) (_brew approach is recommended_) and DVSA [repo-security-scanner](https://github.com/UKHomeOffice/repo-security-scanner) that runs against your git log history to find accidentally committed passwords or private keys.
 
 We follow the [conventional commit format](https://www.conventionalcommits.org/en/v1.0.0/) when we commit code to the repository and follow the [angular convention](https://github.com/conventional-changelog/commitlint/tree/master/%40commitlint/config-conventional#type-enum).
 
 The type is mandatory and must be all lowercase.
-The scope of your commit remain is also mandatory, it must include your ticket number and be all lowercase. The format for the ticket number can be set in the commitlint.config.js file.
+The scope of your commit remain is also mandatory, it must include your ticket number and be all lowercase. The format for the ticket number can be set in the `commitlint.config.js` file.
 
 ```js
 // Please see /commitlint.config.js for customised format
@@ -139,8 +145,8 @@ The scope of your commit remain is also mandatory, it must include your ticket n
 type(scope?): subject
 
 // examples
-'chore(cvsb-1234): my commit msg' // pass
-'CHORE(cvsb-1234): my commit msg' // will fail
+'chore(cb2-1234): my commit msg' // pass
+'CHORE(cb2-1234): my commit msg' // will fail
 
 ```
 
@@ -156,12 +162,17 @@ Domain Drive Design diagram with Interfaces, Application, Domain layers and Infr
 
 #### Toolings
 
-The code uses [eslint](https://eslint.org/docs/user-guide/getting-started), [typescript clean code standards](https://github.com/labs42io/clean-code-typescript) as well as sonarqube for static analysis.
-SonarQube is available locally, please follow the instructions below if you wish to run the service locally (brew is the preferred approach):
+The code uses [eslint](https://eslint.org/docs/user-guide/getting-started), [typescript clean code standards](https://github.com/labs42io/clean-code-typescript) as well as [SonarQube for static analysis](https://docs.sonarqube.org/latest/).
+SonarQube is available locally, please follow the instructions below if you wish to run the service locally (docker is the preferred approach):
+
+- _Docker_:
+  - Run `docker run -d -p 9000:9000 --name sonarqube sonarqube:latest`
+  - The SonarQube container won't start automatically with your PC. To start it run `docker start sonarqube`
+  - Login with admin/admin - http://localhost:9000 and create a Project with name and key found in `./sonar-project.properties`. There you'll also find instructions for creating and configuring an authentication token.
+  - Run the analysis with `npm run sonar-scanner`
 
 - _Brew_:
-
-  - Install sonarqube using brew
+  - Install SonarQube using brew
   - Change `sonar.host.url` to point to localhost, by default, sonar runs on `http://localhost:9000`
   - run the sonar server `sonar start`, then perform your analysis `npm run sonar-scanner`
 
