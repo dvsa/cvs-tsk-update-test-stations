@@ -10,8 +10,8 @@ import config from '../config';
 
 const TestStationType = new Map<number, string>([
   [147160000, 'atf'],
-  [147160001, 'iva & atf'],
-  [147160002, 'iva'],
+  [147160001, 'gvts'],
+  [147160002, 'potf'],
 ]);
 
 const TestStationStatus = new Map<number, string>([
