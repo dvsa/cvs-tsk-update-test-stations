@@ -4,10 +4,11 @@ export default {
     ceClientSecret: process.env.CE_CLIENT_SECRET || '',
     ceAuthority: process.env.CE_AUTHORITY || '',
     ceResource: process.env.CE_RESOURCE || '',
-    ceAccountUrl: process.env.CE_ACCOUNT_URL || '',
+    ceRoleId: process.env.CE_CONNECTIONS_ROLE_ID || '',
+    ceBaseUrl: process.env.CE_BASE_URL || '',
     maxRetryAttempts: process.env.MAX_RETRY_ATTEMPTS || '',
     scalingDuration: process.env.MAX_SCALING_DURATION || '',
-    siteList: process.env.STATION_LIST_SECRET || ''
+    siteList: process.env.STATION_LIST_SECRET || '',
   },
   aws: {
     eventBusSource: process.env.AWS_EVENT_BUS_SOURCE || '',

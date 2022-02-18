@@ -1,7 +1,7 @@
 import { AxiosResponse } from 'axios';
 import { DynamicsTestStation } from '../../../src/crm/DynamicsTestStation';
 
-export const MOCK_DYNAMICS_RESPONSE: AxiosResponse = {
+export const MOCK_DYNAMICS_ACCOUNTS_RESPONSE: AxiosResponse = {
   data: {
     value: [
       <DynamicsTestStation>{
