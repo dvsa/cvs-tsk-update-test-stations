@@ -89,10 +89,10 @@ describe('getTestStation', () => {
     jest.mock('../../src/crm/dynamicsWebApi', () => jest.fn());
     const spy = jest.spyOn(GetTestStations, 'getTestStationEntities');
     axios.get = jest.fn().mockReturnValueOnce(of(MOCK_DATA));
-    config.crm.ceAccountUrl = 'http://testapi';
+    config.crm.ceBaseUrl = 'http://testapi';
     await getTestStations(new Date('2020-10-21'));
     expect(spy).toHaveBeenCalledWith(
-      'http://testapi/?$select=accountid,address1_composite,name,emailaddress1,dvsa_premisecodes,dvsa_testfacilitytype,dvsa_accountstatus,address1_latitude,address1_longitude,telephone1,dvsa_openingtimes,modifiedon&$filter=modifiedon%20ge%202020-10-21',
+      'http://testapi/accounts/?$select=accountid,address1_composite,name,emailaddress1,dvsa_premisecodes,dvsa_testfacilitytype,dvsa_accountstatus,address1_latitude,address1_longitude,telephone1,dvsa_openingtimes,modifiedon&$filter=modifiedon%20ge%202020-10-21',
     );
   });
 });

@@ -4,9 +4,11 @@ import { lastValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
 import { getToken } from './getToken';
 import { DynamicsTestStation } from './DynamicsTestStation';
+import { DynamicsConnections } from './DynamicsConnections';
 import { DynamoTestStation } from './DynamoTestStation';
 import { getSecret } from '../utils';
 import config from '../config';
+import logger from '../observability/logger';
 
 const TestStationType = new Map<number, string>([
   [147160000, 'atf'],
@@ -38,7 +40,7 @@ function createDynamoTestStation(obj: DynamicsTestStation): DynamoTestStation {
     testStationAccessNotes: null,
     testStationAddress: `${obj.address1_line1}, ${obj.address1_line2}`,
     testStationContactNumber: obj.telephone1,
-    testStationEmails: [obj.emailaddress1],
+    testStationEmails: [],
     testStationGeneralNotes: obj.dvsa_openingtimes || null,
     testStationLongitude: obj.address1_longitude,
     testStationLatitude: obj.address1_latitude,
@@ -59,8 +61,47 @@ const onRejected = (error: AxiosError) => {
   return Promise.reject(error);
 };
 
-const getTestStationEntities = async (requestUrl: string): Promise<DynamoTestStation[]> => {
+const getAccountsEntities = async (requestUrl: string): Promise<DynamicsTestStation[]> => {
   const siteList = (await getSecret(config.crm.siteList)).split(',');
+
+  interface AccountsFormat {
+    value: DynamicsTestStation[];
+  }
+  return lastValueFrom(
+    axios.get<AccountsFormat>(requestUrl).pipe(
+      map((data) => data.data),
+      map((data: AccountsFormat) => data.value.filter((obj) => siteList.includes(obj.dvsa_premisecodes))),
+    ),
+  );
+};
+
+const addConnectionsEmails = async (stationEntries: DynamicsTestStation[]): Promise<DynamoTestStation[]> => {
+  interface ConnectionsFormat {
+    value: DynamicsConnections[]
+  }
+
+  const ceUrl = config.crm.ceBaseUrl;
+  const { ceRoleId } = config.crm;
+
+  const testStationEvents = stationEntries.map(async (station) => {
+    const requestUrl = `${ceUrl}/connections?$select=_record2id_value&$expand=record1id_account($select=accountid,accountnumber),record2id_contact($select=emailaddress1)&$filter=_record1id_value%20eq%20${station.accountid}%20and%20_record2roleid_value%20eq%${ceRoleId}%20and%20statuscode%20eq%201`;
+
+    const testStationEvent = createDynamoTestStation(station);
+    await lastValueFrom(
+      axios.get<ConnectionsFormat>(requestUrl).pipe(
+        map((data) => data.data),
+        map((data: ConnectionsFormat) => data.value.forEach((connection) => {
+          testStationEvent.testStationEmails.push(connection.record2id_contact.emailaddress1);
+        })),
+      ),
+    );
+    return testStationEvent;
+  });
+
+  return Promise.all(testStationEvents);
+};
+
+const getTestStationEntities = async (requestUrl: string): Promise<DynamoTestStation[]> => {
   const accessToken = await getToken();
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -68,17 +109,15 @@ const getTestStationEntities = async (requestUrl: string): Promise<DynamoTestSta
 
   axios.interceptors.response.use((response) => response, onRejected);
 
-  interface ApiFormat {
-    value: DynamicsTestStation[];
-  }
+  logger.info('Gathering test station entries from accounts table');
+  const accountsEntities = await getAccountsEntities(requestUrl);
 
-  return lastValueFrom(
-    axios.get<ApiFormat>(requestUrl).pipe(
-      map((data) => data.data),
-      map((data: ApiFormat) => data.value.filter((obj) => siteList.includes(obj.dvsa_premisecodes))),
-      map((data) => data.map((obj) => createDynamoTestStation(obj))),
-    ),
-  );
+  logger.info('Appending associated emails from connections table');
+  const result = await addConnectionsEmails(accountsEntities);
+
+  return result;
 };
 
-export { getTestStationEntities, onRejected, createDynamoTestStation };
+export {
+  getTestStationEntities, onRejected, createDynamoTestStation, getAccountsEntities, addConnectionsEmails,
+};

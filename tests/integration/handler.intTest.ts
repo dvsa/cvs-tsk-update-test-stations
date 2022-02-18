@@ -2,7 +2,8 @@ import axios from 'axios-observable';
 import { of } from 'rxjs';
 import MockDate from 'mockdate';
 import { handler } from '../../src/handler';
-import { MOCK_DYNAMICS_RESPONSE } from './data/mockDynamicsCeResponse';
+import { MOCK_DYNAMICS_ACCOUNTS_RESPONSE } from './data/mockDynamicsAccountsResponse';
+import { MOCK_DYNAMICS_CONNECTIONS_RESPONSE } from './data/mockDynamicsConnectionsResponse';
 import { GetExpectedEvent } from './data/mockEventBridgeEvents';
 
 // mock our config
@@ -35,7 +36,8 @@ jest.mock('@azure/msal-node', () => ({
 }));
 
 // Dynamics OData Response (axios)
-axios.get = jest.fn().mockReturnValue(of(MOCK_DYNAMICS_RESPONSE));
+axios.get = jest.fn().mockReturnValueOnce(of(MOCK_DYNAMICS_ACCOUNTS_RESPONSE)).mockReturnValueOnce(of(MOCK_DYNAMICS_CONNECTIONS_RESPONSE[0])).mockReturnValueOnce(of(MOCK_DYNAMICS_CONNECTIONS_RESPONSE[1]))
+  .mockReturnValueOnce(of(MOCK_DYNAMICS_CONNECTIONS_RESPONSE[2]));
 
 describe('Handler integration test', () => {
   beforeAll(() => {

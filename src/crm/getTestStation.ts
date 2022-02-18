@@ -6,12 +6,12 @@ import { DynamoTestStation } from './DynamoTestStation';
 import config from '../config';
 
 export const getTestStations = async (date: Date): Promise<DynamoTestStation[]> => {
-  const ceUrl = config.crm.ceAccountUrl;
+  const ceUrl = config.crm.ceBaseUrl;
   const modifiedOnDate: string = dateFormat(date, 'yyyy-mm-dd');
 
   logger.info(`Trying to get test stations informations modified since: ${modifiedOnDate}`);
 
-  const filteredUrl = `${ceUrl}/?$select=accountid,address1_composite,name,emailaddress1,dvsa_premisecodes,dvsa_testfacilitytype,dvsa_accountstatus,address1_latitude,address1_longitude,telephone1,dvsa_openingtimes,modifiedon&$filter=modifiedon%20ge%20${modifiedOnDate}`;
+  const filteredUrl = `${ceUrl}/accounts/?$select=accountid,address1_composite,name,emailaddress1,dvsa_premisecodes,dvsa_testfacilitytype,dvsa_accountstatus,address1_latitude,address1_longitude,telephone1,dvsa_openingtimes,modifiedon&$filter=modifiedon%20ge%20${modifiedOnDate}`;
 
   const run = async (): Promise<DynamoTestStation[]> => {
     const response = await getTestStationEntities(filteredUrl);
