@@ -4,11 +4,13 @@ import { lastValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
 import { getToken } from './getToken';
 import { DynamicsTestStation } from './DynamicsTestStation';
-import { DynamicsConnections } from './DynamicsConnections';
+import { DynamicsConnection } from './DynamicsConnection';
 import { DynamoTestStation } from './DynamoTestStation';
 import { getSecret } from '../utils';
 import config from '../config';
 import logger from '../observability/logger';
+
+const { ceRoleId, ceBaseUrl } = config.crm;
 
 const TestStationType = new Map<number, string>([
   [147160000, 'atf'],
@@ -24,7 +26,7 @@ const TestStationStatus = new Map<number, string>([
   [147160004, 'terminated'],
 ]);
 
-function createDynamoTestStation(obj: DynamicsTestStation): DynamoTestStation {
+function mapToDynamoTestStation(obj: DynamicsTestStation): DynamoTestStation {
   if (!TestStationStatus.has(obj.dvsa_accountstatus)) {
     throw new Error(
       `Invalid enum value provided for test station status field: ${obj.dvsa_accountstatus} for test station: ${obj.accountid}`,
@@ -61,7 +63,7 @@ const onRejected = (error: AxiosError) => {
   return Promise.reject(error);
 };
 
-const getAccountsEntities = async (requestUrl: string): Promise<DynamicsTestStation[]> => {
+const getModifiedTestStations = async (requestUrl: string): Promise<DynamicsTestStation[]> => {
   const siteList = (await getSecret(config.crm.siteList)).split(',');
 
   interface AccountsFormat {
@@ -75,30 +77,18 @@ const getAccountsEntities = async (requestUrl: string): Promise<DynamicsTestStat
   );
 };
 
-const addConnectionsEmails = async (stationEntries: DynamicsTestStation[]): Promise<DynamoTestStation[]> => {
+const getReportRecipientEmails = async (stationId: string): Promise<string[]> => {
   interface ConnectionsFormat {
-    value: DynamicsConnections[]
+    value: DynamicsConnection[];
   }
+  const requestUrl = `${ceBaseUrl}/connections?$select=_record2id_value&$expand=record1id_account($select=accountid,accountnumber),record2id_contact($select=emailaddress1)&$filter=_record1id_value%20eq%20${stationId}%20and%20_record2roleid_value%20eq%${ceRoleId}%20and%20statuscode%20eq%201`;
 
-  const ceUrl = config.crm.ceBaseUrl;
-  const { ceRoleId } = config.crm;
-
-  const testStationEvents = stationEntries.map(async (station) => {
-    const requestUrl = `${ceUrl}/connections?$select=_record2id_value&$expand=record1id_account($select=accountid,accountnumber),record2id_contact($select=emailaddress1)&$filter=_record1id_value%20eq%20${station.accountid}%20and%20_record2roleid_value%20eq%${ceRoleId}%20and%20statuscode%20eq%201`;
-
-    const testStationEvent = createDynamoTestStation(station);
-    await lastValueFrom(
-      axios.get<ConnectionsFormat>(requestUrl).pipe(
-        map((data) => data.data),
-        map((data: ConnectionsFormat) => data.value.forEach((connection) => {
-          testStationEvent.testStationEmails.push(connection.record2id_contact.emailaddress1);
-        })),
-      ),
-    );
-    return testStationEvent;
-  });
-
-  return Promise.all(testStationEvents);
+  return lastValueFrom(
+    axios.get<ConnectionsFormat>(requestUrl).pipe(
+      map((data) => data.data),
+      map((data: ConnectionsFormat) => data.value.map((entry) => entry.record2id_contact.emailaddress1)),
+    ),
+  );
 };
 
 const getTestStationEntities = async (requestUrl: string): Promise<DynamoTestStation[]> => {
@@ -109,15 +99,19 @@ const getTestStationEntities = async (requestUrl: string): Promise<DynamoTestSta
 
   axios.interceptors.response.use((response) => response, onRejected);
 
-  logger.info('Gathering test station entries from accounts table');
-  const accountsEntities = await getAccountsEntities(requestUrl);
+  logger.info('Gathering modified test station entries from accounts table');
+  const modifiedTestStations = await getModifiedTestStations(requestUrl);
 
-  logger.info('Appending associated emails from connections table');
-  const result = await addConnectionsEmails(accountsEntities);
+  const mappedTestStations = modifiedTestStations.map(async (station) => {
+    const result = mapToDynamoTestStation(station);
+    const emails = await getReportRecipientEmails(station.accountid);
+    result.testStationEmails = emails;
+    return result;
+  });
 
-  return result;
+  return Promise.all(mappedTestStations);
 };
 
 export {
-  getTestStationEntities, onRejected, createDynamoTestStation, getAccountsEntities, addConnectionsEmails,
+  getModifiedTestStations, onRejected, mapToDynamoTestStation, getTestStationEntities, getReportRecipientEmails,
 };

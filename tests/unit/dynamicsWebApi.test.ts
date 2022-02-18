@@ -3,7 +3,11 @@ import { of } from 'rxjs';
 import { mocked } from 'ts-jest/utils';
 import { AxiosResponse, AxiosError } from 'axios';
 import {
-  onRejected, createDynamoTestStation, getAccountsEntities, addConnectionsEmails,
+  onRejected,
+  mapToDynamoTestStation,
+  getModifiedTestStations,
+  getTestStationEntities,
+  getReportRecipientEmails,
 } from '../../src/crm/dynamicsWebApi';
 // import { DynamoTestStation } from '../../src/crm/DynamoTestStation';
 import { DynamicsTestStation } from '../../src/crm/DynamicsTestStation';
@@ -149,82 +153,83 @@ describe('dynamicsWebApi', () => {
     config: {},
   };
 
-  const MOCK_CONNECTIONS_RESPONSE: AxiosResponse[] = [{
-    data: {
-      value: [
-        {
-          '@odata.etag': 'string',
-          _record2id_value: 'string',
-          connectionid: 'string',
-          record1id_account: {
-            accountid: 'string',
-            accountnumber: '00000',
+  const MOCK_CONNECTIONS_RESPONSE: AxiosResponse[] = [
+    {
+      data: {
+        value: [
+          {
+            '@odata.etag': 'string',
+            _record2id_value: 'string',
+            connectionid: 'string',
+            record1id_account: {
+              accountid: 'string',
+              accountnumber: '00000',
+            },
+            record2id_contact: {
+              emailaddress1: 'email@email.co.uk',
+              contactid: 'string',
+            },
           },
-          record2id_contact: {
-            emailaddress1: 'email@email.co.uk',
-            contactid: 'string',
+          {
+            '@odata.etag': 'string',
+            _record2id_value: 'string',
+            connectionid: 'string',
+            record1id_account: {
+              accountid: 'string',
+              accountnumber: '00000',
+            },
+            record2id_contact: {
+              emailaddress1: 'email2@email.co.uk',
+              contactid: 'string',
+            },
           },
-        },
-        {
-          '@odata.etag': 'string',
-          _record2id_value: 'string',
-          connectionid: 'string',
-          record1id_account: {
-            accountid: 'string',
-            accountnumber: '00000',
+          {
+            '@odata.etag': 'string',
+            _record2id_value: 'string',
+            connectionid: 'string',
+            record1id_account: {
+              accountid: 'string',
+              accountnumber: '00000',
+            },
+            record2id_contact: {
+              emailaddress1: 'email3@email.co.uk',
+              contactid: 'string',
+            },
           },
-          record2id_contact: {
-            emailaddress1: 'email2@email.co.uk',
-            contactid: 'string',
-          },
-        },
-        {
-          '@odata.etag': 'string',
-          _record2id_value: 'string',
-          connectionid: 'string',
-          record1id_account: {
-            accountid: 'string',
-            accountnumber: '00000',
-          },
-          record2id_contact: {
-            emailaddress1: 'email3@email.co.uk',
-            contactid: 'string',
-          },
-        },
-      ],
+        ],
+      },
+      status: 200,
+      statusText: 'Ok',
+      headers: {
+        Authorization: '',
+      },
+      config: {},
     },
-    status: 200,
-    statusText: 'Ok',
-    headers: {
-      Authorization: '',
-    },
-    config: {},
-  },
-  {
-    data: {
-      value: [
-        {
-          '@odata.etag': 'string',
-          _record2id_value: 'string',
-          connectionid: 'string',
-          record1id_account: {
-            accountid: 'string',
-            accountnumber: '00000',
+    {
+      data: {
+        value: [
+          {
+            '@odata.etag': 'string',
+            _record2id_value: 'string',
+            connectionid: 'string',
+            record1id_account: {
+              accountid: 'string',
+              accountnumber: '00000',
+            },
+            record2id_contact: {
+              emailaddress1: 'email@email.co.uk',
+              contactid: 'string',
+            },
           },
-          record2id_contact: {
-            emailaddress1: 'email@email.co.uk',
-            contactid: 'string',
-          },
-        },
-      ],
+        ],
+      },
+      status: 200,
+      statusText: 'Ok',
+      headers: {
+        Authorization: '',
+      },
+      config: {},
     },
-    status: 200,
-    statusText: 'Ok',
-    headers: {
-      Authorization: '',
-    },
-    config: {},
-  },
   ];
 
   const MOCK_RESULT: DynamoTestStation[] = [
@@ -275,7 +280,7 @@ describe('dynamicsWebApi', () => {
     toJSON: () => null,
   };
 
-  test('GIVEN mock axios odata failure response WHEN called THEN returns error that doesn\'t contain Authorization header sent in the initial request', () => {
+  test("GIVEN mock axios odata failure response WHEN called THEN returns error that doesn't contain Authorization header sent in the initial request", () => {
     expect(MOCK_FAILURE.config.headers).toEqual({ Authorization: 'Bearer awdawdawdawd' });
     const PROMISE = onRejected(MOCK_FAILURE);
     return PROMISE.then(
@@ -289,25 +294,38 @@ describe('dynamicsWebApi', () => {
 
   test('GIVEN mock axios odata succesful response with invalid testStationPNumber WHEN called THEN throws an error', () => {
     function throwAnError() {
-      createDynamoTestStation(MOCK_BAD_ACCOUNTS_DATA);
+      mapToDynamoTestStation(MOCK_BAD_ACCOUNTS_DATA);
     }
     expect(throwAnError).toThrowError(
       new Error('Invalid enum value provided for test station type field: 1471600 for test station: 1234'),
     );
   });
 
+  test('GIVEN mock axios odata successful response from connections table WHEN called THEN returns array of emails', async () => {
+    const EMAILS = ['email@email.co.uk', 'email2@email.co.uk', 'email3@email.co.uk'];
+    axios.get = jest.fn().mockReturnValueOnce(of(MOCK_CONNECTIONS_RESPONSE[0]));
+    const result = await getReportRecipientEmails('');
+    expect(result).toEqual(EMAILS);
+  });
+
   test('GIVEN mock axios odata succesful response from accounts table WHEN called THEN returns array of filtered DynamicsTestStation objects', async () => {
     const siteList = 'P601,P602';
     axios.get = jest.fn().mockReturnValueOnce(of(MOCK_ACCOUNTS_RESPONSE));
-    const result = await getAccountsEntities('');
+    const result = await getModifiedTestStations('');
     expect(siteList).toContain(result[0].dvsa_premisecodes);
     expect(siteList).toContain(result[1].dvsa_premisecodes);
     expect(result).toHaveLength(2);
+    expect(result).toEqual(MOCK_GETACCOUNTS_RETURN);
   });
 
-  test('GIVEN mock axios odata succesful response from connections table WHEN called THEN returns an array of DynamoTestStation objects containing array of email addresses', async () => {
-    axios.get = jest.fn().mockReturnValueOnce(of(MOCK_CONNECTIONS_RESPONSE[0])).mockReturnValueOnce(of(MOCK_CONNECTIONS_RESPONSE[1]));
-    const result = await addConnectionsEmails(MOCK_GETACCOUNTS_RETURN);
+  test('GIVEN mock axios odata succesful response from accounts & connections table WHEN getTestStationEntities called THEN returns an array of DynamoTestStation objects containing array of email addresses', async () => {
+    axios.get = jest
+      .fn()
+      .mockReturnValueOnce(of(MOCK_ACCOUNTS_RESPONSE))
+      .mockReturnValueOnce(of(MOCK_CONNECTIONS_RESPONSE[0]))
+      .mockReturnValueOnce(of(MOCK_CONNECTIONS_RESPONSE[1]));
+
+    const result = await getTestStationEntities('');
     expect(result).toHaveLength(2);
     expect(result).toEqual(MOCK_RESULT);
     expect(result[0].testStationEmails).toHaveLength(3);

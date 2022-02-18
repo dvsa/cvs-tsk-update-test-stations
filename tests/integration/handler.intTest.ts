@@ -36,7 +36,11 @@ jest.mock('@azure/msal-node', () => ({
 }));
 
 // Dynamics OData Response (axios)
-axios.get = jest.fn().mockReturnValueOnce(of(MOCK_DYNAMICS_ACCOUNTS_RESPONSE)).mockReturnValueOnce(of(MOCK_DYNAMICS_CONNECTIONS_RESPONSE[0])).mockReturnValueOnce(of(MOCK_DYNAMICS_CONNECTIONS_RESPONSE[1]))
+axios.get = jest
+  .fn()
+  .mockReturnValueOnce(of(MOCK_DYNAMICS_ACCOUNTS_RESPONSE))
+  .mockReturnValueOnce(of(MOCK_DYNAMICS_CONNECTIONS_RESPONSE[0]))
+  .mockReturnValueOnce(of(MOCK_DYNAMICS_CONNECTIONS_RESPONSE[1]))
   .mockReturnValueOnce(of(MOCK_DYNAMICS_CONNECTIONS_RESPONSE[2]));
 
 describe('Handler integration test', () => {

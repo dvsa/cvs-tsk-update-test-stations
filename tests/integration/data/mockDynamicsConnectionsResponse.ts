@@ -1,12 +1,12 @@
 import { AxiosResponse } from 'axios';
-import { DynamicsConnections } from '../../../src/crm/DynamicsConnections';
+import { DynamicsConnection } from '../../../src/crm/DynamicsConnection';
 // import { DynamicsConnections } from '../../../src/crm/DynamicsConnections';
 
 export const MOCK_DYNAMICS_CONNECTIONS_RESPONSE: AxiosResponse[] = [
   {
     data: {
       value: [
-        <DynamicsConnections>{
+        <DynamicsConnection>{
           '@odata.etag': 'string',
           _record2id_value: 'string',
           connectionid: 'string',
@@ -19,7 +19,7 @@ export const MOCK_DYNAMICS_CONNECTIONS_RESPONSE: AxiosResponse[] = [
             contactid: 'string',
           },
         },
-        <DynamicsConnections>{
+        <DynamicsConnection>{
           '@odata.etag': 'string',
           _record2id_value: 'string',
           connectionid: 'string',
@@ -32,7 +32,7 @@ export const MOCK_DYNAMICS_CONNECTIONS_RESPONSE: AxiosResponse[] = [
             contactid: 'string',
           },
         },
-        <DynamicsConnections>{
+        <DynamicsConnection>{
           '@odata.etag': 'string',
           _record2id_value: 'string',
           connectionid: 'string',
@@ -57,7 +57,7 @@ export const MOCK_DYNAMICS_CONNECTIONS_RESPONSE: AxiosResponse[] = [
   {
     data: {
       value: [
-        <DynamicsConnections>{
+        <DynamicsConnection>{
           '@odata.etag': 'string',
           _record2id_value: 'string',
           connectionid: 'string',
@@ -82,7 +82,7 @@ export const MOCK_DYNAMICS_CONNECTIONS_RESPONSE: AxiosResponse[] = [
   {
     data: {
       value: [
-        <DynamicsConnections>{
+        <DynamicsConnection>{
           '@odata.etag': 'string',
           _record2id_value: 'string',
           connectionid: 'string',
@@ -95,7 +95,7 @@ export const MOCK_DYNAMICS_CONNECTIONS_RESPONSE: AxiosResponse[] = [
             contactid: 'string',
           },
         },
-        <DynamicsConnections>{
+        <DynamicsConnection>{
           '@odata.etag': 'string',
           _record2id_value: 'string',
           connectionid: 'string',
@@ -117,5 +117,4 @@ export const MOCK_DYNAMICS_CONNECTIONS_RESPONSE: AxiosResponse[] = [
     },
     config: {},
   },
-
 ];
