@@ -26,6 +26,10 @@ const TestStationStatus = new Map<number, string>([
   [147160004, 'terminated'],
 ]);
 
+function mapAddress(line1: string, line2: string): string {
+  return [line1, line2].filter(Boolean).join(', ');
+}
+
 function mapToDynamoTestStation(obj: DynamicsTestStation): DynamoTestStation {
   if (!TestStationStatus.has(obj.dvsa_accountstatus)) {
     throw new Error(
@@ -40,7 +44,7 @@ function mapToDynamoTestStation(obj: DynamicsTestStation): DynamoTestStation {
   return {
     testStationId: obj.accountid,
     testStationAccessNotes: null,
-    testStationAddress: `${obj.address1_line1}, ${obj.address1_line2}`,
+    testStationAddress: mapAddress(obj.address1_line1, obj.address1_line2),
     testStationContactNumber: obj.telephone1,
     testStationEmails: [],
     testStationGeneralNotes: obj.dvsa_openingtimes || null,
@@ -113,5 +117,9 @@ const getTestStationEntities = async (requestUrl: string): Promise<DynamoTestSta
 };
 
 export {
-  getModifiedTestStations, onRejected, mapToDynamoTestStation, getTestStationEntities, getReportRecipientEmails,
+  getModifiedTestStations,
+  onRejected,
+  mapToDynamoTestStation,
+  getTestStationEntities,
+  getReportRecipientEmails,
 };
