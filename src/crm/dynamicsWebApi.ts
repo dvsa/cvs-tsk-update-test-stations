@@ -74,7 +74,6 @@ const getModifiedTestStations = async (requestUrl: string): Promise<DynamicsTest
   interface AccountsFormat {
     value: DynamicsTestStation[];
   }
-  logger.debug('getModifiedTestStations finishing.');
   return lastValueFrom(
     axios.get<AccountsFormat>(requestUrl).pipe(
       map((data) => data.data),
@@ -90,7 +89,6 @@ const getReportRecipientEmails = async (stationId: string): Promise<string[]> =>
   }
   const requestUrl = `${ceBaseUrl}/connections?$select=_record2id_value&$expand=record1id_account($select=accountid,accountnumber),record2id_contact($select=emailaddress1)&$filter=_record1id_value%20eq%20${stationId}%20and%20_record2roleid_value%20eq%${ceRoleId}%20and%20statuscode%20eq%201`;
 
-  logger.debug('getReportRecipientEmails finishing.');
   return lastValueFrom(
     axios.get<ConnectionsFormat>(requestUrl).pipe(
       map((data) => data.data),
@@ -118,7 +116,6 @@ const getTestStationEntities = async (requestUrl: string): Promise<DynamoTestSta
     return result;
   });
 
-  logger.debug('getTestStationEntities finishing.');
   return Promise.all(mappedTestStations);
 };
 
