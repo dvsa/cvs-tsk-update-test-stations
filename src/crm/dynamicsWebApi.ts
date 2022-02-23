@@ -68,11 +68,13 @@ const onRejected = (error: AxiosError) => {
 };
 
 const getModifiedTestStations = async (requestUrl: string): Promise<DynamicsTestStation[]> => {
+  logger.debug('getModifiedTestStations starting.');
   const siteList = (await getSecret(config.crm.siteList)).split(',');
 
   interface AccountsFormat {
     value: DynamicsTestStation[];
   }
+  logger.debug('getModifiedTestStations finishing.');
   return lastValueFrom(
     axios.get<AccountsFormat>(requestUrl).pipe(
       map((data) => data.data),
@@ -82,11 +84,13 @@ const getModifiedTestStations = async (requestUrl: string): Promise<DynamicsTest
 };
 
 const getReportRecipientEmails = async (stationId: string): Promise<string[]> => {
+  logger.debug('getReportRecipientEmails starting.');
   interface ConnectionsFormat {
     value: DynamicsConnection[];
   }
   const requestUrl = `${ceBaseUrl}/connections?$select=_record2id_value&$expand=record1id_account($select=accountid,accountnumber),record2id_contact($select=emailaddress1)&$filter=_record1id_value%20eq%20${stationId}%20and%20_record2roleid_value%20eq%${ceRoleId}%20and%20statuscode%20eq%201`;
 
+  logger.debug('getReportRecipientEmails finishing.');
   return lastValueFrom(
     axios.get<ConnectionsFormat>(requestUrl).pipe(
       map((data) => data.data),
@@ -96,6 +100,7 @@ const getReportRecipientEmails = async (stationId: string): Promise<string[]> =>
 };
 
 const getTestStationEntities = async (requestUrl: string): Promise<DynamoTestStation[]> => {
+  logger.debug('getTestStationEntities starting.');
   const accessToken = await getToken();
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -113,6 +118,7 @@ const getTestStationEntities = async (requestUrl: string): Promise<DynamoTestSta
     return result;
   });
 
+  logger.debug('getTestStationEntities finishing.');
   return Promise.all(mappedTestStations);
 };
 
@@ -123,4 +129,3 @@ export {
   getTestStationEntities,
   getReportRecipientEmails,
 };
-
