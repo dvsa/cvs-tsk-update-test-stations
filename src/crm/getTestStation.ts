@@ -7,6 +7,7 @@ import config from '../config';
 
 export const getTestStations = async (date: Date): Promise<DynamoTestStation[]> => {
   const ceUrl = config.crm.ceBaseUrl;
+
   const modifiedOnDate: string = dateFormat(date, 'yyyy-mm-dd');
 
   logger.info(`Trying to get test stations informations modified since: ${modifiedOnDate}`);

@@ -79,6 +79,7 @@ export const GetExpectedEvent = (i: number): Entries => {
               testStationStatus: 'suspended',
               testStationTown: 'SITE-3 city',
               testStationType: 'potf',
+
             }),
             DetailType: 'CVS ATF Test Station',
             EventBusName: config.aws.eventBusName,
