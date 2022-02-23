@@ -14,7 +14,7 @@ export interface EventDetail {
 
 const ONE_DAY = 1;
 
-console.log(
+logger.info(
   `\nRunning Service:\n '${SERVICE}'\n mode: ${NODE_ENV}\n stage: '${AWS_PROVIDER_STAGE}'\n region: '${AWS_PROVIDER_REGION}'\n\n`,
 );
 
