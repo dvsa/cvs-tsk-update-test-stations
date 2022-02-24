@@ -330,6 +330,5 @@ describe('dynamicsWebApi', () => {
     expect(result).toEqual(MOCK_RESULT);
     expect(result[0].testStationEmails).toHaveLength(3);
     expect(result[1].testStationEmails).toHaveLength(1);
-
   });
 });

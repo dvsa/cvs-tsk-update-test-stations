@@ -68,6 +68,7 @@ const onRejected = (error: AxiosError) => {
 };
 
 const getModifiedTestStations = async (requestUrl: string): Promise<DynamicsTestStation[]> => {
+  logger.debug('getModifiedTestStations starting.');
   const siteList = (await getSecret(config.crm.siteList)).split(',');
 
   interface AccountsFormat {
@@ -82,6 +83,7 @@ const getModifiedTestStations = async (requestUrl: string): Promise<DynamicsTest
 };
 
 const getReportRecipientEmails = async (stationId: string): Promise<string[]> => {
+  logger.debug('getReportRecipientEmails starting.');
   interface ConnectionsFormat {
     value: DynamicsConnection[];
   }
@@ -96,6 +98,7 @@ const getReportRecipientEmails = async (stationId: string): Promise<string[]> =>
 };
 
 const getTestStationEntities = async (requestUrl: string): Promise<DynamoTestStation[]> => {
+  logger.debug('getTestStationEntities starting.');
   const accessToken = await getToken();
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -123,4 +126,3 @@ export {
   getTestStationEntities,
   getReportRecipientEmails,
 };
-
