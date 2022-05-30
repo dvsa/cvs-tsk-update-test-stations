@@ -209,6 +209,18 @@ describe('dynamicsWebApi', () => {
     },
   ];
 
+  const MOCK_CONNECTIONS_NO_EMAILS_RESPONSE: AxiosResponse = {
+    data: {
+      value: [],
+    },
+    status: 200,
+    statusText: 'Ok',
+    headers: {
+      Authorization: '',
+    },
+    config: {},
+  }
+
   const MOCK_RESULT: DynamoTestStation[] = [
     {
       testStationId: 'string',
@@ -305,4 +317,17 @@ describe('dynamicsWebApi', () => {
     expect(result[0].testStationEmails).toHaveLength(3);
     expect(result[1].testStationEmails).toHaveLength(1);
   });
+
+  test('GIVEN succesful response from connections table WHEN there are no emails present THEN return DynamoTestStation object with empty array for emails', async () => {
+    axios.get = jest
+      .fn()
+      .mockReturnValueOnce(of(MOCK_ACCOUNTS_RESPONSE))
+      .mockReturnValueOnce(of(MOCK_CONNECTIONS_NO_EMAILS_RESPONSE))
+      .mockReturnValueOnce(of(MOCK_CONNECTIONS_RESPONSE[1]));
+
+    const result = await getTestStationEntities('');
+    expect(result).toHaveLength(2);
+    expect(result[0].testStationEmails).toHaveLength(0);
+    expect(result[1].testStationEmails).toHaveLength(1);
+  })
 });

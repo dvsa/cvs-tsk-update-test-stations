@@ -89,7 +89,12 @@ const getReportRecipientEmails = async (stationId: string): Promise<string[]> =>
   return lastValueFrom(
     axios.get<ConnectionsFormat>(requestUrl).pipe(
       map((data) => data.data),
-      map((data: ConnectionsFormat) => data.value.map((entry) => entry.record2id_contact.emailaddress1)),
+      map((data: ConnectionsFormat) => {
+        if (data.value.length === 0) {
+          return []
+        }
+        return data.value.map((entry) => entry.record2id_contact.emailaddress1)
+      }),
     ),
   );
 };
