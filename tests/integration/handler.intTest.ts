@@ -6,16 +6,13 @@ import { MOCK_DYNAMICS_ACCOUNTS_RESPONSE } from './data/mockDynamicsAccountsResp
 import { MOCK_DYNAMICS_CONNECTIONS_RESPONSE } from './data/mockDynamicsConnectionsResponse';
 import { GetExpectedEvent } from './data/mockEventBridgeEvents';
 
-// mock our config
-const ALLOWED_SITE_LIST = 'SITE-1,SITE-2,SITE-3';
-
 // mock the external resources
 // AWS
 const putEventsFn = jest.fn();
 jest.mock('aws-sdk', () => ({
   SecretsManager: jest.fn().mockImplementation(() => ({
     getSecretValue: jest.fn().mockImplementation(() => ({
-      promise: jest.fn().mockResolvedValue({ SecretString: ALLOWED_SITE_LIST }),
+      promise: jest.fn().mockResolvedValue({}),
     })),
   })),
   EventBridge: jest.fn().mockImplementation(() => ({

@@ -31,7 +31,7 @@
     "lint:report": "npm run lint:analyse -- -f json -o reports/eslint/eslint-report.json",
     "lint": "npm-run-all lint:*",
     "prettier": "prettier --write ./**/*.{js,ts}",
-    "security-checks": "git secrets --scan && git log -p | scanrepo",
+    "security-checks": "git secrets --scan",
     "clean": "rimraf ./.build ./.artifact ./.serverless/*.zip",
     "compile": "tsc",
     "build": "tsc --rootDir ./ --outDir .build --sourceMap false && npm run build:copy && rimraf .build/tests",

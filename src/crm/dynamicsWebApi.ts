@@ -6,7 +6,6 @@ import { getToken } from './getToken';
 import { DynamicsTestStation } from './DynamicsTestStation';
 import { DynamicsConnection } from './DynamicsConnection';
 import { DynamoTestStation } from './DynamoTestStation';
-import { getSecret } from '../utils';
 import config from '../config';
 import logger from '../observability/logger';
 
@@ -69,15 +68,13 @@ const onRejected = (error: AxiosError) => {
 
 const getModifiedTestStations = async (requestUrl: string): Promise<DynamicsTestStation[]> => {
   logger.debug('getModifiedTestStations starting.');
-  const siteList = (await getSecret(config.crm.siteList)).split(',');
 
   interface AccountsFormat {
     value: DynamicsTestStation[];
   }
   return lastValueFrom(
     axios.get<AccountsFormat>(requestUrl).pipe(
-      map((data) => data.data),
-      map((data: AccountsFormat) => data.value.filter((obj) => siteList.includes(obj.dvsa_premisecodes))),
+      map((data) => data.data.value),
     ),
   );
 };

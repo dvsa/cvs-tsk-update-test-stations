@@ -1,6 +1,5 @@
 import axios from 'axios-observable';
 import { of } from 'rxjs';
-import { mocked } from 'ts-jest/utils';
 import { AxiosResponse, AxiosError } from 'axios';
 import {
   onRejected,
@@ -11,7 +10,6 @@ import {
 } from '../../src/crm/dynamicsWebApi';
 // import { DynamoTestStation } from '../../src/crm/DynamoTestStation';
 import { DynamicsTestStation } from '../../src/crm/DynamicsTestStation';
-import { getSecret } from '../../src/utils';
 import { DynamoTestStation } from '../../src/crm/DynamoTestStation';
 
 jest.mock('../../src/crm/getToken', () => ({
@@ -20,8 +18,6 @@ jest.mock('../../src/crm/getToken', () => ({
 jest.mock('../../src/utils/index');
 
 describe('dynamicsWebApi', () => {
-  mocked(getSecret).mockResolvedValue('P601,P602');
-
   const MOCK_BAD_ACCOUNTS_DATA: DynamicsTestStation = {
     '@odata.etag': 'string',
     accountid: '1234',
@@ -118,25 +114,6 @@ describe('dynamicsWebApi', () => {
           address1_latitude: 'string',
           name: 'string',
           dvsa_premisecodes: 'P602',
-          address1_postalcode: 'string',
-          dvsa_accountstatus: 147160001,
-          address1_city: 'string',
-          dvsa_testfacilitytype: 147160000,
-          modifiedon: '',
-        },
-        {
-          '@odata.etag': 'string',
-          accountid: 'string',
-          address1_composite: 'string',
-          address1_line1: 'Address 1',
-          address1_line2: 'Address 2',
-          telephone1: 'string',
-          emailaddress1: 'string',
-          dvsa_openingtimes: 'string',
-          address1_longitude: 'string',
-          address1_latitude: 'string',
-          name: 'string',
-          dvsa_premisecodes: 'P6012',
           address1_postalcode: 'string',
           dvsa_accountstatus: 147160001,
           address1_city: 'string',
@@ -309,11 +286,8 @@ describe('dynamicsWebApi', () => {
   });
 
   test('GIVEN mock axios odata succesful response from accounts table WHEN called THEN returns array of filtered DynamicsTestStation objects', async () => {
-    const siteList = 'P601,P602';
     axios.get = jest.fn().mockReturnValueOnce(of(MOCK_ACCOUNTS_RESPONSE));
     const result = await getModifiedTestStations('');
-    expect(siteList).toContain(result[0].dvsa_premisecodes);
-    expect(siteList).toContain(result[1].dvsa_premisecodes);
     expect(result).toHaveLength(2);
     expect(result).toEqual(MOCK_GETACCOUNTS_RETURN);
   });
