@@ -15,16 +15,16 @@ const MOCK_CONNECTIONS_DATA: AxiosResponse = {
     value: [
       {
         '@odata.etag': 'string',
-          _record2id_value: 'string',
-          connectionid: 'string',
-          record1id_account: {
-            accountid: 'string',
-            accountnumber: '00000',
-          },
-          record2id_contact: {
-            emailaddress1: 'email@email.co.uk',
-            contactid: 'string',
-          },
+        _record2id_value: 'string',
+        connectionid: 'string',
+        record1id_account: {
+          accountid: 'string',
+          accountnumber: '00000',
+        },
+        record2id_contact: {
+          emailaddress1: 'email@email.co.uk',
+          contactid: 'string',
+        },
       },
     ],
   },
@@ -32,7 +32,7 @@ const MOCK_CONNECTIONS_DATA: AxiosResponse = {
   statusText: 'Ok',
   headers: '',
   config: {},
-}
+};
 
 const MOCK_DATA: AxiosResponse = {
   data: {
