@@ -285,7 +285,7 @@ describe('dynamicsWebApi', () => {
     expect(result).toEqual(EMAILS);
   });
 
-  test('GIVEN mock axios odata succesful response from accounts table WHEN called THEN returns array of filtered DynamicsTestStation objects', async () => {
+  test('GIVEN mock axios odata succesful response from accounts table WHEN called THEN returns array of DynamicsTestStation objects', async () => {
     axios.get = jest.fn().mockReturnValueOnce(of(MOCK_ACCOUNTS_RESPONSE));
     const result = await getModifiedTestStations('');
     expect(result).toHaveLength(2);
