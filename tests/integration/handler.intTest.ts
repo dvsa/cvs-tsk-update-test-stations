@@ -36,9 +36,7 @@ jest.mock('@azure/msal-node', () => ({
 axios.get = jest
   .fn()
   .mockReturnValueOnce(of(MOCK_DYNAMICS_ACCOUNTS_RESPONSE))
-  .mockReturnValueOnce(of(MOCK_DYNAMICS_CONNECTIONS_RESPONSE[0]))
-  .mockReturnValueOnce(of(MOCK_DYNAMICS_CONNECTIONS_RESPONSE[1]))
-  .mockReturnValueOnce(of(MOCK_DYNAMICS_CONNECTIONS_RESPONSE[2]));
+  .mockReturnValueOnce(of(MOCK_DYNAMICS_CONNECTIONS_RESPONSE));
 
 describe('Handler integration test', () => {
   beforeAll(() => {
