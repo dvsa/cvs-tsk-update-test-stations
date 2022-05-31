@@ -1,11 +1,7 @@
 import axios from 'axios-observable';
 import { of } from 'rxjs';
 import { AxiosResponse, AxiosError } from 'axios';
-import {
-  onRejected,
-  getModifiedTestStations,
-  getReportRecipientEmails,
-} from '../../src/crm/dynamicsWebApi';
+import { onRejected, getModifiedTestStations, getReportRecipientEmails } from '../../src/crm/dynamicsWebApi';
 import { DynamicsTestStation } from '../../src/crm/DynamicsTestStation';
 import { DynamicsConnection } from '../../src/crm/DynamicsConnection';
 

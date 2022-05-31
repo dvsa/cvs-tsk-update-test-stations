@@ -30,11 +30,7 @@ const getModifiedTestStations = async (requestUrl: string): Promise<DynamicsTest
   interface AccountsFormat {
     value: DynamicsTestStation[];
   }
-  return lastValueFrom(
-    axios.get<AccountsFormat>(requestUrl).pipe(
-      map((data) => data.data.value),
-    ),
-  );
+  return lastValueFrom(axios.get<AccountsFormat>(requestUrl).pipe(map((data) => data.data.value)));
 };
 
 const getReportRecipientEmails = async (): Promise<DynamicsConnection[]> => {
@@ -51,15 +47,7 @@ const getReportRecipientEmails = async (): Promise<DynamicsConnection[]> => {
   }
   const requestUrl = `${ceBaseUrl}/connections?$select=_record2id_value&$expand=record1id_account($select=accountid,accountnumber),record2id_contact($select=emailaddress1)&$filter=_record2roleid_value%20eq%${ceRoleId}%20and%20statuscode%20eq%201`;
 
-  return lastValueFrom(
-    axios.get<ConnectionsFormat>(requestUrl).pipe(
-      map((data) => data.data.value),
-    ),
-  );
+  return lastValueFrom(axios.get<ConnectionsFormat>(requestUrl).pipe(map((data) => data.data.value)));
 };
 
-export {
-  getModifiedTestStations,
-  onRejected,
-  getReportRecipientEmails,
-};
+export { getModifiedTestStations, onRejected, getReportRecipientEmails };

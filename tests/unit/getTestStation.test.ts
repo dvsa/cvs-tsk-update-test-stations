@@ -1,3 +1,6 @@
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+import { EOL } from 'os';
 import axios from 'axios-observable';
 import { throwError, of } from 'rxjs';
 import { AxiosResponse } from '../../node_modules/axios-observable/node_modules/axios/index.d';
@@ -189,6 +192,20 @@ const MOCK_BAD_ACCOUNTS_DATA: DynamicsTestStation = {
   modifiedon: '',
 };
 
+const MOCK_BAD_ACCOUNTS_RESPONSE: AxiosResponse = {
+  data: {
+    value: [
+      MOCK_BAD_ACCOUNTS_DATA,
+    ],
+  },
+  status: 200,
+  statusText: 'Ok',
+  headers: {
+    Authorization: '',
+  },
+  config: {},
+};
+
 describe('retryStrategy', () => {
   test('GIVEN an odata endpoint WHEN there is a short transient error and no retries THEN the call is not successful.', async () => {
     config.crm.maxRetryAttempts = '0';
@@ -208,7 +225,7 @@ describe('retryStrategy', () => {
     axios.get = jest
       .fn()
       .mockReturnValueOnce(throwError(() => error1))
-      .mockReturnValueOnce(of(MOCK_DATA))
+      .mockReturnValueOnce(of(MOCK_ACCOUNTS_RESPONSE))
       .mockReturnValueOnce(of(MOCK_CONNECTIONS_RESPONSE));
     await expect(getTestStations(new Date())).resolves.toBeTruthy();
   });
@@ -227,13 +244,13 @@ describe('retryStrategy', () => {
 });
 
 describe('mapToDynamoTestStation', () => {
-  test('GIVEN mock axios odata succesful response with invalid testStationPNumber WHEN called THEN throws an error', () => {
-    function throwAnError() {
-      mapToDynamoTestStation(MOCK_BAD_ACCOUNTS_DATA);
-    }
-    expect(throwAnError).toThrowError(
-      new Error('Invalid enum value provided for test station type field: 1471600 for test station: 1234'),
-    );
+  test('GIVEN mock axios odata succesful response with invalid test station type WHEN called THEN returns null and logs error', () => {
+    // @ts-ignore
+    const consoleSpy = jest.spyOn(console._stdout, 'write');
+    const result = mapToDynamoTestStation(MOCK_BAD_ACCOUNTS_DATA);
+
+    expect(consoleSpy).toHaveBeenCalledWith(`error: Invalid enum value provided for test station type field: 1471600 for test station: 1234${EOL}`);
+    expect(result).toEqual(null);
   });
 });
 
@@ -252,7 +269,7 @@ describe('getTestStation', () => {
     );
   });
 
-  test('GIVEN mock axios odata succesful response from accounts & connections table WHEN getTestStationEntities called THEN returns an array of DynamoTestStation objects containing array of email addresses', async () => {
+  test('GIVEN succesful response from accounts & connections table WHEN getTestStationEntities called THEN returns an array of DynamoTestStation objects containing array of email addresses', async () => {
     axios.get = jest
       .fn()
       .mockReturnValueOnce(of(MOCK_ACCOUNTS_RESPONSE))
@@ -265,6 +282,20 @@ describe('getTestStation', () => {
     expect(result[1].testStationEmails).toHaveLength(1);
   });
 
+  test('GIVEN succesful response from accounts table WHEN invalid test station type is present THEN return empty array and logs error', async () => {
+    // @ts-ignore
+    const consoleSpy = jest.spyOn(console._stdout, 'write');
+    axios.get = jest
+      .fn()
+      .mockReturnValueOnce(of(MOCK_BAD_ACCOUNTS_RESPONSE))
+      .mockReturnValueOnce(of(MOCK_CONNECTIONS_NO_EMAILS_RESPONSE));
+
+    const result = await getTestStations(new Date());
+
+    expect(consoleSpy).toHaveBeenCalledWith(`error: Invalid enum value provided for test station type field: 1471600 for test station: 1234${EOL}`);
+    expect(result).toHaveLength(0);
+  });
+
   test('GIVEN succesful response from connections table WHEN there are no emails present THEN return DynamoTestStation object with empty array for emails', async () => {
     axios.get = jest
       .fn()
@@ -273,7 +304,6 @@ describe('getTestStation', () => {
 
     const result = await getTestStations(new Date());
     expect(result).toHaveLength(2);
-    console.log(result);
     expect(result[0].testStationEmails).toHaveLength(0);
     expect(result[1].testStationEmails).toHaveLength(0);
   });

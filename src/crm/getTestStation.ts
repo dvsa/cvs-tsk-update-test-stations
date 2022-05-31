@@ -27,14 +27,16 @@ function mapAddress(line1: string, line2: string): string {
 
 export function mapToDynamoTestStation(obj: DynamicsTestStation): DynamoTestStation {
   if (!TestStationStatus.has(obj.dvsa_accountstatus)) {
-    throw new Error(
+    logger.error(
       `Invalid enum value provided for test station status field: ${obj.dvsa_accountstatus} for test station: ${obj.accountid}`,
     );
+    return null;
   }
   if (!TestStationType.has(obj.dvsa_testfacilitytype)) {
-    throw new Error(
+    logger.error(
       `Invalid enum value provided for test station type field: ${obj.dvsa_testfacilitytype} for test station: ${obj.accountid}`,
     );
+    return null;
   }
   return {
     testStationId: obj.accountid,
@@ -93,7 +95,7 @@ export const getTestStations = async (date: Date): Promise<DynamoTestStation[]> 
     minTimeout: Number(config.crm.scalingDuration),
   });
 
-  const mappedTestStations = testStationAccounts.map((entry) => mapToDynamoTestStation(entry));
+  const mappedTestStations = testStationAccounts.map((entry) => mapToDynamoTestStation(entry)).filter((entry) => entry !== null);
 
   mappedTestStations.forEach((station) => {
     testStationEmails.forEach((connection) => {
