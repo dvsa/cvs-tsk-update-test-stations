@@ -16,7 +16,7 @@ describe('Handler', () => {
     const now = new Date(Date.now());
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const expectedDate = new Date(today.setDate(today.getDate() - 1)); // 1: day
-    const event = <ScheduledEvent<EventDetail>><unknown>{};
+    const event = <ScheduledEvent<EventDetail>>(<unknown>{});
 
     handler(event, null, () => {});
     expect(getTestStations).toHaveBeenCalledWith(expectedDate);
