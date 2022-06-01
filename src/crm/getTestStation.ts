@@ -64,7 +64,7 @@ export const getTestStations = async (date: Date): Promise<DynamoTestStation[]> 
   const filteredUrl = `${ceUrl}/accounts/?$select=accountid,address1_line1,address1_line2,telephone1,dvsa_openingtimes,address1_longitude,address1_latitude,name,dvsa_premisecodes,address1_postalcode,dvsa_accountstatus,address1_city,dvsa_testfacilitytype,modifiedon&$filter=modifiedon%20ge%20${modifiedOnDate}`;
 
   const runAccounts = async (): Promise<DynamicsTestStation[]> => {
-    logger.info('Trying to get test station emails from connections table');
+    logger.info(`Trying to get test stations informations modified since: ${modifiedOnDate}`);
 
     const response = await getModifiedTestStations(filteredUrl);
 
@@ -72,7 +72,7 @@ export const getTestStations = async (date: Date): Promise<DynamoTestStation[]> 
   };
 
   const runEmails = async (): Promise<DynamicsConnection[]> => {
-    logger.info(`Trying to get test stations informations modified since: ${modifiedOnDate}`);
+    logger.info('Trying to get test station emails from connections table');
 
     const response = await getReportRecipientEmails();
 
@@ -95,7 +95,9 @@ export const getTestStations = async (date: Date): Promise<DynamoTestStation[]> 
     minTimeout: Number(config.crm.scalingDuration),
   });
 
-  const mappedTestStations = testStationAccounts.map((entry) => mapToDynamoTestStation(entry)).filter((entry) => entry !== null);
+  const mappedTestStations = testStationAccounts
+    .map((entry) => mapToDynamoTestStation(entry))
+    .filter((entry) => entry !== null);
 
   mappedTestStations.forEach((station) => {
     testStationEmails.forEach((connection) => {
