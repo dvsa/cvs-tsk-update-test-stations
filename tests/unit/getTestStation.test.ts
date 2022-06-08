@@ -194,9 +194,7 @@ const MOCK_BAD_ACCOUNTS_DATA: DynamicsTestStation = {
 
 const MOCK_BAD_ACCOUNTS_RESPONSE: AxiosResponse = {
   data: {
-    value: [
-      MOCK_BAD_ACCOUNTS_DATA,
-    ],
+    value: [MOCK_BAD_ACCOUNTS_DATA],
   },
   status: 200,
   statusText: 'Ok',
@@ -249,7 +247,9 @@ describe('mapToDynamoTestStation', () => {
     const consoleSpy = jest.spyOn(console._stdout, 'write');
     const result = mapToDynamoTestStation(MOCK_BAD_ACCOUNTS_DATA);
 
-    expect(consoleSpy).toHaveBeenCalledWith(`error: Invalid enum value provided for test station type field: 1471600 for test station: 1234${EOL}`);
+    expect(consoleSpy).toHaveBeenCalledWith(
+      `error: Invalid enum value provided for test station type field: 1471600 for test station: 1234${EOL}`,
+    );
     expect(result).toEqual(null);
   });
 });
@@ -265,7 +265,7 @@ describe('getTestStation', () => {
     config.crm.ceBaseUrl = 'http://testapi';
     await getTestStations(new Date('2020-10-21'));
     expect(spy).toHaveBeenCalledWith(
-      'http://testapi/accounts/?$select=accountid,address1_line1,address1_line2,telephone1,dvsa_openingtimes,address1_longitude,address1_latitude,name,dvsa_premisecodes,address1_postalcode,dvsa_accountstatus,address1_city,dvsa_testfacilitytype,modifiedon&$filter=modifiedon%20ge%202020-10-21',
+      'http://testapi/accounts/?$select=accountid,address1_line1,address1_line2,telephone1,dvsa_openingtimes,address1_longitude,address1_latitude,name,dvsa_premisecodes,address1_postalcode,dvsa_accountstatus,address1_city,dvsa_testfacilitytype,modifiedon&$filter=modifiedon%20ge%202020-10-21%20and%20dvsa_accounttype%20eq%20100000000',
     );
   });
 
@@ -292,7 +292,9 @@ describe('getTestStation', () => {
 
     const result = await getTestStations(new Date());
 
-    expect(consoleSpy).toHaveBeenCalledWith(`error: Invalid enum value provided for test station type field: 1471600 for test station: 1234${EOL}`);
+    expect(consoleSpy).toHaveBeenCalledWith(
+      `error: Invalid enum value provided for test station type field: 1471600 for test station: 1234${EOL}`,
+    );
     expect(result).toHaveLength(0);
   });
 
