@@ -25,10 +25,7 @@ const handler = async (): Promise<void> => {
 
   const stmts = await Promise.allSettled(generateStatements(activeList, dynamoList).map((stmt) => client.put(stmt).promise()));
 
-  const rejectedRecords = stmts.filter((r) => r.status === 'rejected');
-  for (const rejection of rejectedRecords) {
-      logger.error((<PromiseRejectedResult>rejection).reason)
-  }
+  stmts.filter((r) => r.status === 'rejected').map((r) => logger.error((<PromiseRejectedResult>r).reason));
 };
 
 function generateStatements(activeMembers:MemberDetails[], dynamoRecords: IDynamoRecord[]): AWS.DynamoDB.DocumentClient.PutItemInput[] {
