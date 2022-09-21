@@ -8,7 +8,7 @@ export default async function getToken() {
   const cca = new ConfidentialClientApplication({
     auth: {
       clientId: config.aad.clientId,
-      clientSecret: clientSecretValue
+      clientSecret: clientSecretValue,
     },
   });
   const tokenRequest = {

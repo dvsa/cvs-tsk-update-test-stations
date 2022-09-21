@@ -1,7 +1,7 @@
 import { ConfidentialClientApplication, AuthenticationResult } from '@azure/msal-node';
 import { mocked } from 'ts-jest/utils';
 import config from '../../src/config';
-import { getToken } from '../../src/aad/getToken';
+import getToken from '../../src/aad/getToken';
 import { getSecret } from '../../src/utils/index';
 
 jest.mock('../../src/utils/index');
