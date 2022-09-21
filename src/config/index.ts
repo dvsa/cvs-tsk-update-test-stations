@@ -1,18 +1,13 @@
 export default {
-  crm: {
-    ceClientId: process.env.CE_CLIENT_ID || '',
-    ceClientSecret: process.env.CE_CLIENT_SECRET || '',
-    ceAuthority: process.env.CE_AUTHORITY || '',
-    ceResource: process.env.CE_RESOURCE || '',
-    ceRoleId: process.env.CE_CONNECTIONS_ROLE_ID || '',
-    ceBaseUrl: process.env.CE_BASE_URL || '',
-    maxRetryAttempts: process.env.MAX_RETRY_ATTEMPTS || '',
-    scalingDuration: process.env.MAX_SCALING_DURATION || '',
-    siteList: process.env.STATION_LIST_SECRET || '',
+  aad: {
+    clientId: process.env.AAD_CLIENT_ID || '',
+    clientSecret: process.env.AAD_CLIENT_SECRET || '',
+    authorityId: process.env.AAD_AUTHORITY_ID || '',
+    baseUrl: process.env.AAD_BASE_URL || 'https://graph.microsoft.com/',
+    groupId: process.env.AAD_TESTER_GROUP_ID || ''
   },
   aws: {
-    eventBusSource: process.env.AWS_EVENT_BUS_SOURCE || '',
-    eventBusName: process.env.AWS_EVENT_BUS_NAME || '',
+    dynamoTable: process.env.DYNAMO_TABLE || '',
   },
   logger: {
     logLevel: process.env.LOG_LEVEL || 'info',

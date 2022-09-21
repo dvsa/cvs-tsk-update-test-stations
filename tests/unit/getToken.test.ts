@@ -1,7 +1,7 @@
 import { ConfidentialClientApplication, AuthenticationResult } from '@azure/msal-node';
 import { mocked } from 'ts-jest/utils';
 import config from '../../src/config';
-import { getToken } from '../../src/crm/getToken';
+import { getToken } from '../../src/aad/getToken';
 import { getSecret } from '../../src/utils/index';
 
 jest.mock('../../src/utils/index');
@@ -25,9 +25,9 @@ describe('getToken', () => {
   };
 
   test('GIVEN a succesful response WHEN called THEN expected access token to be in response', async () => {
-    config.crm.ceClientId = 'CLIENTID';
-    config.crm.ceClientSecret = 'CLIENTSECRET';
-    config.crm.ceAuthority = 'https://login.microsoftonline.com/xyz';
+    config.aad.clientId = 'CLIENTID';
+    config.aad.clientSecret = 'CLIENTSECRET';
+    config.aad.authorityId = 'https://login.microsoftonline.com/xyz';
 
     ConfidentialClientApplication.prototype.acquireTokenByClientCredential = jest.fn().mockResolvedValue(RESULT);
     const result = await getToken();
@@ -35,9 +35,9 @@ describe('getToken', () => {
   });
 
   test('GIVEN a failed request WHEN called THEN expect error to be thrown', async () => {
-    config.crm.ceClientId = 'CLIENTID';
-    config.crm.ceClientSecret = 'CLIENTSECRET';
-    config.crm.ceAuthority = 'https://login.microsoftonline.com/xyz';
+    config.aad.clientId = 'CLIENTID';
+    config.aad.clientSecret = 'CLIENTSECRET';
+    config.aad.authorityId = 'https://login.microsoftonline.com/xyz';
 
     const ERROR = new Error('Hello');
 
