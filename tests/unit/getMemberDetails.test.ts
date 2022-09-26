@@ -26,7 +26,7 @@ jest.mock('axios', () => {
   return mockAxios;
 });
 
-describe('Handler', () => {
+describe('getMemberDetails', () => {
   beforeEach(() => {
     config.aad.groupId = 'testGroup';
     config.aad.baseUrl = 'https://test';
