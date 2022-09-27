@@ -4,8 +4,8 @@
   "description": "",
   "main": "src/handler.ts",
   "engines": {
-    "node": "14.*",
-    "npm": "6.*"
+    "node": "16.*",
+    "npm": "8.*"
   },
   "husky": {
     "hooks": {
@@ -65,7 +65,7 @@
     "@serverless/typescript": "2.65.0",
     "@types/aws-lambda": "8.10.70",
     "@types/dateformat": "5.0.0",
-    "@types/jest": "27.0.2",
+    "@types/jest": "29.0.3",
     "@types/node": "14.14.20",
     "@types/supertest": "2.0.10",
     "@typescript-eslint/eslint-plugin": "5.3.1",
@@ -78,19 +78,20 @@
     "eslint-plugin-jest": "24.3.2",
     "eslint-plugin-prettier": "3.3.1",
     "husky": "4.3.7",
-    "jest": "27.3.1",
+    "jest": "29.0.3",
+    "jest-config": "29.0.3",
     "mockdate": "3.0.5",
     "npm-run-all": "4.1.5",
     "prettier": "2.2.1",
     "rimraf": "3.0.2",
-    "semantic-release": "18.0.0",
-    "serverless": "2.66.1",
-    "serverless-dotenv-plugin": "3.12.2",
-    "serverless-offline": "8.2.0",
+    "semantic-release": "19.0.5",
+    "serverless": "3.22.0",
+    "serverless-dotenv-plugin": "3.11.1",
+    "serverless-offline": "8.8.1",
     "serverless-offline-aws-eventbridge": "1.6.5",
     "serverless-plugin-typescript": "2.1.0",
     "supertest": "6.0.1",
-    "ts-jest": "27.0.7",
+    "ts-jest": "29.0.2",
     "ts-loader": "8.0.14",
     "ts-node": "9.1.1",
     "typescript": "4.4.4"

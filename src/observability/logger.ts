@@ -3,10 +3,10 @@ import config from '../config';
 
 const { printf } = format;
 
-const logFormat = printf((info) => {
+const logFormat = printf((info:{ level:string, message:string, stack?:string }) => {
   // Checks if log is an error - has stack info
   if (info.stack) {
-    return `${info.level}: ${info.stack as string}`;
+    return `${info.level}: ${info.stack}`;
   }
   return `${info.level}: ${info.message}`;
 });
