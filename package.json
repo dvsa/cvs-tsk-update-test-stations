@@ -20,7 +20,7 @@
     "test:unit": "cross-env NODE_ENV=test API_VERSION=${npm_package_version} jest --runInBand",
     "test:unit:watch": "npm run test:unit -- --watch",
     "test:unit:coverage": "cross-env npm run test:unit -- --coverage",
-    "test-i": "npm run test:integration",
+    "test-i": "echo 'integration tests to be added'",
     "test:integration": "BRANCH=local jest --testMatch=\"**/*.intTest.ts\"",
     "test:integration:watch": "echo 'integration tests --watch to be added'",
     "test:integration:coverage": "cross-env echo 'integration tests coverage to be added'",
