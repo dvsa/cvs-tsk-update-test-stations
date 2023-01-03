@@ -13,7 +13,7 @@ export default async function getToken() {
     },
   });
   const tokenRequest = {
-    scopes: [],
+    scopes: ['https://graph.microsoft.com/.default'],
   };
 
   const response: AuthenticationResult = await cca.acquireTokenByClientCredential(tokenRequest);
