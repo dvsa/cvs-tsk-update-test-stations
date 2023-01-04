@@ -10,6 +10,7 @@ export default async function getToken() {
     auth: {
       clientId: secret.CVS_AAD_Client,
       clientSecret: secret.CVS_AAD_Secret,
+      authority: `https://login.microsoftonline.com/${secret.CVS_TENANT_ID}`,
     },
   });
   const tokenRequest = {
