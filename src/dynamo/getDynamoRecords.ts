@@ -8,8 +8,7 @@ export const getDynamoMembers: () => Promise<IDynamoRecord[]> = async () => {
   const result = await dynamo
     .query(<AWS.DynamoDB.DocumentClient.QueryInput>{
       TableName: config.aws.dynamoTable,
-      IndexName: 'NameIndex',
-      KeyConditionExpression: 'referenceType = :type',
+      KeyConditionExpression: 'resourceType = :type',
       ExpressionAttributeValues: {
         ':type': {
           S: 'USER',
