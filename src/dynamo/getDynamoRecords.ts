@@ -10,9 +10,7 @@ export const getDynamoMembers: () => Promise<IDynamoRecord[]> = async () => {
       TableName: config.aws.dynamoTable,
       KeyConditionExpression: 'resourceType = :type',
       ExpressionAttributeValues: {
-        ':type': {
-          'S': 'USER',
-        },
+        ':type': 'USER',
       },
     })
     .promise();

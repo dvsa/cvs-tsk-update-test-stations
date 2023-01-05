@@ -55,7 +55,7 @@ describe('getDynamoMembers', () => {
       TableName: 'testTable',
       KeyConditionExpression: 'resourceType = :type',
       ExpressionAttributeValues: {
-        ':type': { S: 'USER' },
+        ':type': 'USER',
       },
     });
   });
