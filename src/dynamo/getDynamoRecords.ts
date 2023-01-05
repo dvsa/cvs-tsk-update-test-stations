@@ -11,7 +11,7 @@ export const getDynamoMembers: () => Promise<IDynamoRecord[]> = async () => {
       KeyConditionExpression: 'resourceType = :type',
       ExpressionAttributeValues: {
         ':type': {
-          S: 'USER',
+          'S': 'USER',
         },
       },
     })
