@@ -38,9 +38,9 @@ function generateStatements(
     (am) => <AWS.DynamoDB.DocumentClient.PutItemInput>{
       TableName: config.aws.dynamoTable,
       Item: {
-        resourceType: { S: 'USER' },
-        resourceKey: { S: am.userPrincipalName },
-        name: { S: am.displayName },
+        resourceType: 'USER',
+        resourceKey: am.userPrincipalName,
+        name: am.displayName,
       },
     },
   );
@@ -56,10 +56,10 @@ function generateStatements(
       (dr) => <AWS.DynamoDB.DocumentClient.PutItemInput>{
         TableName: config.aws.dynamoTable,
         Item: {
-          resourceType: { S: 'USER' },
-          resourceKey: { S: dr.email },
-          name: { S: dr.name },
-          ttl: { N: expirationTime },
+          resourceType: 'USER',
+          resourceKey: dr.email,
+          name: dr.name,
+          ttl: expirationTime,
         },
       },
     );

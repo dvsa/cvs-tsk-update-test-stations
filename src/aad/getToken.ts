@@ -4,7 +4,7 @@ import { getSecret } from '../utils/index';
 import { AadSecret } from './AadSecret';
 
 export default async function getToken() {
-  const secret = JSON.parse(await getSecret(config.aws.Secret as string)) as AadSecret;
+  const secret = JSON.parse(await getSecret(config.aws.Secret)) as AadSecret;
 
   const cca = new ConfidentialClientApplication({
     auth: {
