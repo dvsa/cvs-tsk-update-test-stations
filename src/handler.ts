@@ -25,7 +25,7 @@ const handler = async (): Promise<void> => {
     generateStatements(activeList, dynamoList).map((stmt) => client.put(stmt).promise()),
   );
 
-  stmts.filter((r) => r.status === 'rejected').map((r) => logger.error(JSON.stringify(<PromiseRejectedResult>r)));
+  stmts.filter((r) => r.status === 'rejected').forEach((r) => logger.error(JSON.stringify(<PromiseRejectedResult>r)));
 };
 
 function generateStatements(
@@ -64,7 +64,10 @@ function generateStatements(
         },
     );
 
-  return memberMap.concat(drMap);
+  const x = memberMap.concat(drMap);
+  logger.error(x);
+
+  return x;
 }
 
 export { handler };
