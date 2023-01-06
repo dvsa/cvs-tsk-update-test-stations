@@ -65,7 +65,7 @@ function generateStatements(
     );
 
   const x = memberMap.concat(drMap);
-  logger.error(x);
+  logger.error(JSON.stringify(x));
 
   return x;
 }
