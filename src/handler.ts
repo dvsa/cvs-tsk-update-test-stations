@@ -7,9 +7,7 @@ import { getMemberDetails } from './aad/getMemberDetails';
 import { getDynamoMembers } from './dynamo/getDynamoRecords';
 import config from './config';
 
-const {
-  NODE_ENV, SERVICE, AWS_PROVIDER_REGION, AWS_PROVIDER_STAGE,
-} = process.env;
+const { NODE_ENV, SERVICE, AWS_PROVIDER_REGION, AWS_PROVIDER_STAGE } = process.env;
 
 logger.info(
   `\nRunning Service:\n '${SERVICE}'\n mode: ${NODE_ENV}\n stage: '${AWS_PROVIDER_STAGE}'\n region: '${AWS_PROVIDER_REGION}'\n\n`,
@@ -35,14 +33,15 @@ function generateStatements(
   dynamoRecords: IDynamoRecord[],
 ): AWS.DynamoDB.DocumentClient.PutItemInput[] {
   const memberMap = activeMembers.map(
-    (am) => <AWS.DynamoDB.DocumentClient.PutItemInput>{
-      TableName: config.aws.dynamoTable,
-      Item: {
-        resourceType: { S: 'USER' },
-        resourceKey: { S: am.userPrincipalName },
-        name: { S: am.displayName },
+    (am) =>
+      <AWS.DynamoDB.DocumentClient.PutItemInput>{
+        TableName: config.aws.dynamoTable,
+        Item: {
+          resourceType: 'USER',
+          resourceKey: am.userPrincipalName,
+          name: am.displayName,
+        },
       },
-    },
   );
 
   const SECONDS_IN_AN_HOUR = 60 * 60;
@@ -53,15 +52,16 @@ function generateStatements(
   const drMap = dynamoRecords
     .filter((dr) => !activeMembers.some((am) => am.userPrincipalName === dr.email))
     .map(
-      (dr) => <AWS.DynamoDB.DocumentClient.PutItemInput>{
-        TableName: config.aws.dynamoTable,
-        Item: {
-          resourceType: { S: 'USER' },
-          resourceKey: { S: dr.email },
-          name: { S: dr.name },
-          ttl: { N: expirationTime },
+      (dr) =>
+        <AWS.DynamoDB.DocumentClient.PutItemInput>{
+          TableName: config.aws.dynamoTable,
+          Item: {
+            resourceType: 'USER',
+            resourceKey: dr.email,
+            name: dr.name,
+            ttl: expirationTime,
+          },
         },
-      },
     );
 
   return memberMap.concat(drMap);

@@ -1,12 +1,10 @@
 export default {
   aad: {
-    clientId: process.env.AAD_CLIENT_ID || '',
-    clientSecret: process.env.AAD_CLIENT_SECRET || '',
-    authorityId: process.env.AAD_AUTHORITY_ID || '',
     baseUrl: process.env.AAD_BASE_URL || 'https://graph.microsoft.com/',
-    groupId: process.env.AAD_TESTER_GROUP_ID || ''
+    groupId: process.env.AAD_TESTER_GROUP_ID || '',
   },
   aws: {
+    Secret: process.env.AAD_CLIENT_SECRET_NAME || '',
     dynamoTable: process.env.DYNAMO_TABLE || '',
   },
   logger: {

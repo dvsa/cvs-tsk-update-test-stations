@@ -12,15 +12,16 @@ jest.mock('aws-sdk', () => {
     promise: jest.fn().mockResolvedValue(<AWS.DynamoDB.DocumentClient.QueryOutput>{
       Items: [
         {
-          referenceType: { S: 'USER' },
-          referenceKey: { S: 's@test.com' },
+          resourceType: { S: 'USER' },
+          resourceKey: { S: 's@test.com' },
           name: { S: 'test user' },
         },
         {
-          referenceType: { S: 'USER' },
-          referenceKey: { S: 's2@test.com' },
+          resourceType: { S: 'USER' },
+          resourceKey: { S: 's2@test.com' },
           name: { S: 'test user 2' },
-        }],
+        },
+      ],
     }),
   }));
   class FakeDynamoDb {
@@ -52,9 +53,9 @@ describe('getDynamoMembers', () => {
     await getDynamoMembers();
     expect(mockDynamoQuery).toBeCalledWith(<AWS.DynamoDB.DocumentClient.QueryInput>{
       TableName: 'testTable',
-      KeyConditionExpression: 'referenceType = :type',
+      KeyConditionExpression: 'resourceType = :type',
       ExpressionAttributeValues: {
-        ':type': { S: 'USER' },
+        ':type': 'USER',
       },
     });
   });

@@ -4,16 +4,16 @@ import IDynamoRecord from './IDynamoRecord';
 
 const dynamo = new AWS.DynamoDB.DocumentClient();
 
-export const getDynamoMembers:() => Promise<IDynamoRecord[]> = async () => {
-  const result = await dynamo.query(<AWS.DynamoDB.DocumentClient.QueryInput>{
-    TableName: config.aws.dynamoTable,
-    KeyConditionExpression: 'referenceType = :type',
-    ExpressionAttributeValues: {
-      ':type': {
-        S: 'USER',
+export const getDynamoMembers: () => Promise<IDynamoRecord[]> = async () => {
+  const result = await dynamo
+    .query(<AWS.DynamoDB.DocumentClient.QueryInput>{
+      TableName: config.aws.dynamoTable,
+      KeyConditionExpression: 'resourceType = :type',
+      ExpressionAttributeValues: {
+        ':type': 'USER',
       },
-    },
-  }).promise();
+    })
+    .promise();
 
   return <IDynamoRecord[]>result.Items.map((i) => AWS.DynamoDB.Converter.unmarshall(i));
 };
