@@ -44,7 +44,7 @@
     "tools-setup": "echo 'nothing to do for now'"
   },
   "dependencies": {
-    "@azure/msal-node": "1.5.0",
+    "@azure/msal-node": "1.14.6",
     "aws-lambda": "1.0.6",
     "aws-sdk": "2.1029.0",
     "axios": "0.25.0",
