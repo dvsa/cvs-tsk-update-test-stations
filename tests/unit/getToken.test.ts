@@ -7,7 +7,7 @@ import { getSecret } from '../../src/utils/index';
 jest.mock('../../src/utils/index');
 
 describe('getToken', () => {
-  mocked(getSecret).mockResolvedValue('SECRET');
+  mocked(getSecret).mockResolvedValue('SOME_VALUE');
 
   const RESULT: AuthenticationResult = {
     authority: '',
