@@ -3,24 +3,24 @@ import IDynamoRecord from '../../src/dynamo/IDynamoRecord';
 import { handler } from '../../src/handler';
 
 // has to be 'var' as jest "hoists" execution behind the scenes and let/const cause errors
-/* eslint-disable no-var */
+/* tslint:disable */
 var mockMemberDetails: jest.Mock;
 var mockDynamoRecords: jest.Mock;
 var mockDynamoPut: jest.Mock;
 var emptyMemberDetails = true;
 var emptyDynamoDetails = true;
-/* eslint-enable no-var */
+/* tslint:enable */
 
 jest.mock('../../src/aad/getMemberDetails', () => {
   mockMemberDetails = jest.fn().mockResolvedValue(
     emptyMemberDetails
       ? new Array<MemberDetails>()
       : [
-          <MemberDetails>{
+          {
             displayName: 'Test User',
             userPrincipalName: 'test@email.com',
-          },
-      ],
+          } as MemberDetails,
+        ],
   );
   return { getMemberDetails: mockMemberDetails };
 });
@@ -30,21 +30,19 @@ jest.mock('../../src/dynamo/getDynamoRecords', () => {
     emptyDynamoDetails
       ? new Array<IDynamoRecord>()
       : [
-          <IDynamoRecord>{
+          {
             email: 'deleted@email.com',
             name: 'Deleted User',
-          },
-      ],
+          } as IDynamoRecord,
+        ],
   );
   return { getDynamoMembers: mockDynamoRecords };
 });
 
 jest.mock('aws-sdk', () => {
-  mockDynamoPut = jest
-    .fn()
-    .mockImplementation(() => ({
-      promise: jest.fn().mockResolvedValue(<AWS.DynamoDB.DocumentClient.PutItemOutput>{}),
-    }));
+  mockDynamoPut = jest.fn().mockImplementation(() => ({
+    promise: jest.fn().mockResolvedValue({} as AWS.DynamoDB.DocumentClient.PutItemOutput),
+  }));
   class FakeDynamoDb {
     put = mockDynamoPut;
   }
@@ -97,7 +95,7 @@ describe('Handler', () => {
           resourceType: 'USER',
           resourceKey: 'deleted@email.com',
           name: 'Deleted User',
-          ttl: <number>expect.any(Number),
+          ttl: expect.any(Number) as number,
         },
       }),
     );

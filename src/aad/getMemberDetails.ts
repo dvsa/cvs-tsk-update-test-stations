@@ -5,8 +5,8 @@ import MemberDetails from './MemberDetails';
 import config from '../config';
 import getToken from './getToken';
 
-interface MemberList{
-  value: MemberDetails[]
+interface MemberList {
+  value: MemberDetails[];
 }
 
 const onRejected = (error: AxiosError) => {

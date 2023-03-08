@@ -2,14 +2,14 @@ import config from '../../src/config';
 import { getDynamoMembers } from '../../src/dynamo/getDynamoRecords';
 
 // has to be 'var' as jest "hoists" execution behind the scenes and let/const cause errors
-/* eslint-disable no-var */
+/* tslint:disable */
 var mockDynamoQuery: jest.Mock;
 var mockUnmarshall: jest.Mock;
-/* eslint-enable no-var */
+/* tslint:enable */
 
 jest.mock('aws-sdk', () => {
   mockDynamoQuery = jest.fn().mockImplementation(() => ({
-    promise: jest.fn().mockResolvedValue(<AWS.DynamoDB.DocumentClient.QueryOutput>{
+    promise: jest.fn().mockResolvedValue({
       Items: [
         {
           resourceType: { S: 'USER' },
@@ -22,13 +22,13 @@ jest.mock('aws-sdk', () => {
           name: { S: 'test user 2' },
         },
       ],
-    }),
+    } as AWS.DynamoDB.DocumentClient.QueryOutput),
   }));
   class FakeDynamoDb {
     query = mockDynamoQuery;
   }
 
-  mockUnmarshall = jest.fn().mockImplementation(() => {});
+  mockUnmarshall = jest.fn().mockImplementation(() => jest.fn());
 
   const AWS = {
     DynamoDB: {
@@ -51,13 +51,13 @@ describe('getDynamoMembers', () => {
 
   it('should call dynamo query', async () => {
     await getDynamoMembers();
-    expect(mockDynamoQuery).toBeCalledWith(<AWS.DynamoDB.DocumentClient.QueryInput>{
+    expect(mockDynamoQuery).toBeCalledWith({
       TableName: 'testTable',
       KeyConditionExpression: 'resourceType = :type',
       ExpressionAttributeValues: {
         ':type': 'USER',
       },
-    });
+    } as AWS.DynamoDB.DocumentClient.QueryInput);
   });
 
   it('should unmarshall items', async () => {

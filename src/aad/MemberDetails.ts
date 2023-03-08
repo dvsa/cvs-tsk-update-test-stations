@@ -1,7 +1,7 @@
 interface MemberDetails {
   displayName: string;
   userPrincipalName: string;
-  staffId: number | null
+  staffId: number | null;
 }
 
 export default MemberDetails;
