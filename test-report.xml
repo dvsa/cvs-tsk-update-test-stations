@@ -1,27 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testExecutions version="1">
   <file path="/workspaces/cvs-tsk-update-tester-reference-data/tests/unit/handler.test.ts">
-    <testCase name="Handler should request member details" duration="2"/>
-    <testCase name="Handler should request dynamo details" duration="0"/>
+    <testCase name="Handler should request member details" duration="1"/>
+    <testCase name="Handler should request dynamo details" duration="1"/>
     <testCase name="Handler should run a dynamo put for an active record" duration="1"/>
     <testCase name="Handler should run a dynamo put with a ttl for an inactive record" duration="1"/>
   </file>
+  <file path="/workspaces/cvs-tsk-update-tester-reference-data/tests/unit/getMemberDetails.test.ts">
+    <testCase name="getMemberDetails axiosInterceptorOnReject should remove headers on reject" duration="1"/>
+    <testCase name="getMemberDetails should call getToken" duration="16"/>
+    <testCase name="getMemberDetails should get details from the correct url" duration="1"/>
+    <testCase name="getMemberDetails should get details from the correct urls if multiple groups given" duration="3"/>
+  </file>
   <file path="/workspaces/cvs-tsk-update-tester-reference-data/tests/unit/getToken.test.ts">
     <testCase name="getToken GIVEN a succesful response WHEN called THEN expected access token to be in response" duration="1"/>
-    <testCase name="getToken GIVEN a failed request WHEN called THEN expect error to be thrown" duration="10"/>
+    <testCase name="getToken GIVEN a failed request WHEN called THEN expect error to be thrown" duration="12"/>
   </file>
   <file path="/workspaces/cvs-tsk-update-tester-reference-data/tests/unit/logger.test.ts">
     <testCase name="logger functions GIVEN a logger WHEN an info is logged THEN the console message is correct." duration="9"/>
-    <testCase name="logger functions GIVEN a logger WHEN a debug is logged THEN the console message is correct." duration="1"/>
-    <testCase name="logger functions GIVEN a logger WHEN an error is logged THEN the console message is correct." duration="1"/>
+    <testCase name="logger functions GIVEN a logger WHEN a debug is logged THEN the console message is correct." duration="0"/>
+    <testCase name="logger functions GIVEN a logger WHEN an error is logged THEN the console message is correct." duration="0"/>
   </file>
   <file path="/workspaces/cvs-tsk-update-tester-reference-data/tests/unit/getDynamoRecords.test.ts">
-    <testCase name="getDynamoMembers should call dynamo query" duration="1"/>
-    <testCase name="getDynamoMembers should unmarshall items" duration="0"/>
-  </file>
-  <file path="/workspaces/cvs-tsk-update-tester-reference-data/tests/unit/getMemberDetails.test.ts">
-    <testCase name="getMemberDetails axiosInterceptorOnReject should remove headers on reject" duration="2"/>
-    <testCase name="getMemberDetails should call getToken" duration="4"/>
-    <testCase name="getMemberDetails should get details from the correct url" duration="1"/>
+    <testCase name="getDynamoMembers should call dynamo query" duration="2"/>
+    <testCase name="getDynamoMembers should unmarshall items" duration="1"/>
   </file>
 </testExecutions>

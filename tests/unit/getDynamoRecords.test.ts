@@ -15,11 +15,13 @@ jest.mock('aws-sdk', () => {
           resourceType: { S: 'USER' },
           resourceKey: { S: 's@test.com' },
           name: { S: 'test user' },
+          staffId: { S: '6adbf131-c6c2-4bc6-b1e9-b62f812bed29' },
         },
         {
           resourceType: { S: 'USER' },
           resourceKey: { S: 's2@test.com' },
           name: { S: 'test user 2' },
+          staffId: { S: '7d9e8e38-78d5-46ad-9fd0-6adad882161b' },
         },
       ],
     } as AWS.DynamoDB.DocumentClient.QueryOutput),

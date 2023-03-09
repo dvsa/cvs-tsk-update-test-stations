@@ -21,14 +21,31 @@ axios.interceptors.response.use((response) => response, onRejected);
 
 export const getMemberDetails = async (): Promise<MemberDetails[]> => {
   const aadBase = config.aad.baseUrl;
-  const requestUrl = new URL(`/v1.0/groups/${config.aad.groupId}/members`, aadBase).href;
-
-  logger.info('Trying to get aad member list');
+  const groupIds = config.aad.groupId.includes(',') ? config.aad.groupId.split(',') : [config.aad.groupId];
   const accessToken = await getToken();
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-  axios.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
+  const promiseArray = groupIds.map(async (groupId) => {
+    const requestUrl = new URL(`/v1.0/groups/${groupId.trim()}/members`, aadBase).href;
 
-  const response = await axios.get<MemberList>(requestUrl, { headers: { Authorization: `Bearer ${accessToken}` } });
-  return response.data.value;
+    logger.info(`Trying to get aad member list for group: ${groupId.trim()}`);
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    axios.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
+
+    const response = await axios.get<MemberList>(requestUrl, { headers: { Authorization: `Bearer ${accessToken}` } });
+    return response.data.value;
+  });
+
+  const results = await Promise.allSettled(promiseArray);
+
+  const memberDetails: MemberDetails[] = [];
+  results.forEach((result) => {
+    if (result.status === 'fulfilled') {
+      memberDetails.concat(result.value);
+    } else {
+      logger.error(`Error getting member details: ${result.reason}`);
+    }
+  });
+
+  return memberDetails;
 };

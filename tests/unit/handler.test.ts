@@ -19,6 +19,7 @@ jest.mock('../../src/aad/getMemberDetails', () => {
           {
             displayName: 'Test User',
             userPrincipalName: 'test@email.com',
+            staffId: '5afcf0b5-fb7f-4b83-98cc-851a8b27025c',
           } as MemberDetails,
         ],
   );
@@ -33,6 +34,7 @@ jest.mock('../../src/dynamo/getDynamoRecords', () => {
           {
             email: 'deleted@email.com',
             name: 'Deleted User',
+            staffId: '932a98cb-8946-4796-8291-c7bcf4badb50',
           } as IDynamoRecord,
         ],
   );
@@ -81,6 +83,7 @@ describe('Handler', () => {
         resourceType: 'USER',
         resourceKey: 'test@email.com',
         name: 'Test User',
+        staffId: '5afcf0b5-fb7f-4b83-98cc-851a8b27025c',
       },
     });
   });
@@ -95,6 +98,7 @@ describe('Handler', () => {
           resourceType: 'USER',
           resourceKey: 'deleted@email.com',
           name: 'Deleted User',
+          staffId: '932a98cb-8946-4796-8291-c7bcf4badb50',
           ttl: expect.any(Number) as number,
         },
       }),

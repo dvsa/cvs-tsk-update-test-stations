@@ -80,4 +80,13 @@ describe('getMemberDetails', () => {
       headers: { Authorization: 'Bearer testToken' },
     });
   });
+
+  it('should get details from the correct urls if multiple groups given', async () => {
+    config.aad.groupId = 'testGroup1, testGroup2, testGroup3, testGroup4, testGroup5, testGroup6';
+    await getMemberDetails();
+    expect(mockAxiosGet).toBeCalledTimes(6);
+    expect(mockAxiosGet).toHaveBeenLastCalledWith('https://test/v1.0/groups/testGroup6/members', {
+      headers: { Authorization: 'Bearer testToken' },
+    });
+  });
 });
