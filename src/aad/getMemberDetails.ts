@@ -38,14 +38,14 @@ export const getMemberDetails = async (): Promise<MemberDetails[]> => {
 
   const results = await Promise.allSettled(promiseArray);
 
-  const memberDetails: MemberDetails[] = [];
-  results.forEach((result) => {
+  const memberDetails = results.reduce((acc, result) => {
     if (result.status === 'fulfilled') {
-      memberDetails.concat(result.value);
+      acc = [...acc, ...result.value];
     } else {
       logger.error(`Error getting member details: ${result.reason}`);
     }
-  });
+    return acc;
+  }, [] as MemberDetails[]);
 
   return memberDetails;
 };

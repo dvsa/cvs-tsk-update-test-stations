@@ -16,7 +16,7 @@ jest.mock('../../src/aad/getToken', () => {
 });
 
 jest.mock('axios', () => {
-  mockAxiosGet = jest.fn().mockResolvedValue({ data: { value: {} } });
+  mockAxiosGet = jest.fn().mockResolvedValue({ data: { value: [{}] } });
   mockAxiosOnReject = jest.fn();
   mockAxios = {
     interceptors: {
