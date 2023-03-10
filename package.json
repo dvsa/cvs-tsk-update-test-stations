@@ -1,6 +1,6 @@
 {
   "name": "cvs-tsk-update-tester-reference-data",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "description": "",
   "main": "src/handler.ts",
   "engines": {
@@ -26,10 +26,8 @@
     "build": "tsc --rootDir ./ --outDir .build --sourceMap false && npm run build:copy && rimraf .build/tests",
     "build:copy": "find src -type f \\( -name \"*.yml\" -or -name \"*.json\" \\) | cpio -pdm .build && find tests -type f \\( -name \"*.yml\" -or -name \"*.json\" \\)  | cpio -pdm .build",
     "sonar-scanner": "sonar-scanner",
-    "package": "mkdir ${ZIP_NAME} && cp package.json package-lock.json ${ZIP_NAME}/ && cp -r .build/src/* ${ZIP_NAME}/ && cd ${ZIP_NAME} && npm ci --production && rm package.json package-lock.json && zip -qr ../${ZIP_NAME}.zip . && cd .. && rimraf ${ZIP_NAME}",
-    "release": "semantic-release",
+    "package": "mkdir ${ZIP_NAME} && cp package.json package-lock.json ${ZIP_NAME}/ && cp -r .build/src/* ${ZIP_NAME}/ && cd ${ZIP_NAME} && npm ci --omit=dev --ignore-scripts && rm package.json package-lock.json && zip -qr ../${ZIP_NAME}.zip .",
     "prepare": "husky install",
-    "prerelease": "semantic-release --dry-run",
     "tools-setup": "echo 'nothing to do for now'",
     "commit-msg": "commitlint --edit",
     "pre-commit": "npm run audit && npm run lint && npm run format",
