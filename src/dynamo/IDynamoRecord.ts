@@ -1,5 +1,5 @@
-export default interface IDynamoRecord{
-  name: string,
-  email: string,
-  staffId: number | null
+export default interface IDynamoRecord {
+  name: string;
+  email: string;
+  staffId: string | null;
 }

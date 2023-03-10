@@ -40,6 +40,7 @@ function generateStatements(
           resourceType: 'USER',
           resourceKey: am.userPrincipalName,
           name: am.displayName,
+          staffId: am.staffId,
         },
       },
   );
@@ -59,6 +60,7 @@ function generateStatements(
             resourceType: 'USER',
             resourceKey: dr.email,
             name: dr.name,
+            staffId: dr.staffId,
             ttl: expirationTime,
           },
         },

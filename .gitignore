@@ -16,28 +16,28 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+.reports/
 
-# package directories
-node_modules
-jspm_packages
+# Idea specific hidden files
+.idea/**
 
-# temp directories
-.serverless
-.build
-.artifact
-*.zip
+# Node specific files
+node_modules/**
 
-# env files
-*.env*
-!.env.example
+# Serverless specific files
+.dynamodb/**
 
-# Coverage reports
-coverage
-reports
-.scannerwork
+# Build folder
+.build/**
 
 # Source maps
 *.map
 
-# npm audit results
-npm-audit.html
+#coverage
+.nyc_output/**
+coverage/**
+test-report.xml
+
+#sonarqube
+.scannerwork/**
+report.json

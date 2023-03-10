@@ -1,14 +1,14 @@
-import { Axios, AxiosError } from 'axios';
+import { Axios, AxiosError, AxiosRequestHeaders } from 'axios';
 import config from '../../src/config';
 import { getMemberDetails } from '../../src/aad/getMemberDetails';
 
 // has to be 'var' as jest "hoists" execution behind the scenes and let/const cause errors
-/* eslint-disable no-var */
+/* tslint:disable */
 var mockAxios: Axios;
 var mockAxiosOnReject: jest.Mock;
-var mockToken:jest.Mock;
-var mockAxiosGet:jest.Mock;
-/* eslint-enable no-var */
+var mockToken: jest.Mock;
+var mockAxiosGet: jest.Mock;
+/* tslint:enable */
 
 jest.mock('../../src/aad/getToken', () => {
   mockToken = jest.fn().mockResolvedValue('testToken');
@@ -16,15 +16,15 @@ jest.mock('../../src/aad/getToken', () => {
 });
 
 jest.mock('axios', () => {
-  mockAxiosGet = jest.fn().mockResolvedValue({ data: { value: {} } });
+  mockAxiosGet = jest.fn().mockResolvedValue({ data: { value: [{}] } });
   mockAxiosOnReject = jest.fn();
-  mockAxios = <Axios><unknown>{
+  mockAxios = {
     interceptors: {
       response: { use: mockAxiosOnReject },
     },
     defaults: { headers: { common: { Authorization: '' } } },
     get: mockAxiosGet,
-  };
+  } as unknown as Axios;
   return mockAxios;
 });
 
@@ -34,7 +34,7 @@ const error: AxiosError = {
   config: {
     headers: {
       Authorization: 'test',
-    },
+    } as AxiosRequestHeaders,
   },
   isAxiosError: true,
   toJSON: () => ({
@@ -76,6 +76,17 @@ describe('getMemberDetails', () => {
 
   it('should get details from the correct url', async () => {
     await getMemberDetails();
-    expect(mockAxiosGet).toBeCalledWith('https://test/v1.0/groups/testGroup/members', { headers: { Authorization: 'Bearer testToken' } });
+    expect(mockAxiosGet).toBeCalledWith('https://test/v1.0/groups/testGroup/members', {
+      headers: { Authorization: 'Bearer testToken' },
+    });
+  });
+
+  it('should get details from the correct urls if multiple groups given', async () => {
+    config.aad.groupId = 'testGroup1, testGroup2, testGroup3, testGroup4, testGroup5, testGroup6';
+    await getMemberDetails();
+    expect(mockAxiosGet).toBeCalledTimes(6);
+    expect(mockAxiosGet).toHaveBeenLastCalledWith('https://test/v1.0/groups/testGroup6/members', {
+      headers: { Authorization: 'Bearer testToken' },
+    });
   });
 });
