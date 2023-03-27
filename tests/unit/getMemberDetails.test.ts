@@ -1,6 +1,7 @@
 import { Axios, AxiosError, AxiosRequestHeaders } from 'axios';
 import config from '../../src/config';
 import { getMemberDetails } from '../../src/aad/getMemberDetails';
+import IMemberDetails, { MemberType } from '../../src/aad/IMemberDetails';
 
 // has to be 'var' as jest "hoists" execution behind the scenes and let/const cause errors
 /* tslint:disable */
@@ -9,6 +10,14 @@ var mockAxiosOnReject: jest.Mock;
 var mockToken: jest.Mock;
 var mockAxiosGet: jest.Mock;
 /* tslint:enable */
+
+const generateUser = (id: string, mail?: string, userPrincipalName?: string) =>
+  ({
+    '@odata.type': MemberType.User,
+    id,
+    mail: mail || `${id}@example.com`,
+    userPrincipalName: userPrincipalName || `${id}@example-test.com`,
+  } as IMemberDetails);
 
 jest.mock('../../src/aad/getToken', () => {
   mockToken = jest.fn().mockResolvedValue('testToken');
@@ -76,7 +85,7 @@ describe('getMemberDetails', () => {
 
   it('should get details from the correct url', async () => {
     await getMemberDetails();
-    expect(mockAxiosGet).toBeCalledWith('https://test/v1.0/groups/testGroup/members', {
+    expect(mockAxiosGet).toBeCalledWith('https://test/v1.0/groups/testGroup/members?$top=999', {
       headers: { Authorization: 'Bearer testToken' },
     });
   });
@@ -85,8 +94,36 @@ describe('getMemberDetails', () => {
     config.aad.groupId = 'testGroup1, testGroup2, testGroup3, testGroup4, testGroup5, testGroup6';
     await getMemberDetails();
     expect(mockAxiosGet).toBeCalledTimes(6);
-    expect(mockAxiosGet).toHaveBeenLastCalledWith('https://test/v1.0/groups/testGroup6/members', {
+    expect(mockAxiosGet).toHaveBeenLastCalledWith('https://test/v1.0/groups/testGroup6/members?$top=999', {
       headers: { Authorization: 'Bearer testToken' },
     });
+  });
+
+  it('should return a distinct list of members by id if the same member is in multiple groups', async () => {
+    config.aad.groupId = 'testGroup1, testGroup2';
+    mockAxiosGet.mockResolvedValueOnce({
+      data: { value: [generateUser('1-inGroup1'), generateUser('2-inBothGroups')] },
+    });
+    mockAxiosGet.mockResolvedValueOnce({
+      data: { value: [generateUser('2-inBothGroups'), generateUser('3-inGroup2')] },
+    });
+    const result = await getMemberDetails();
+    expect(result).toHaveLength(3);
+  });
+
+  it('should filter out members that are not users', async () => {
+    config.aad.groupId = 'testGroup1';
+    const members = [
+      generateUser('a62188fb-a6dc-4a8a-8882-c155130d6a56'),
+      { id: '07299098-5955-4de0-be5f-cba7337f30de', '@odata.type': '#microsoft.graph.device' },
+      generateUser('7a86586e-8eb5-46a0-b3a1-f957b03aa7af'),
+    ];
+
+    mockAxiosGet.mockResolvedValueOnce({
+      data: { value: members },
+    });
+
+    const result = await getMemberDetails();
+    expect(result).toHaveLength(2);
   });
 });

@@ -1,12 +1,12 @@
 import axios, { AxiosError } from 'axios';
 import { URL } from 'url';
 import logger from '../observability/logger';
-import MemberDetails from './MemberDetails';
+import IMemberDetails, { MemberType } from './IMemberDetails';
 import config from '../config';
 import getToken from './getToken';
 
 interface MemberList {
-  value: MemberDetails[];
+  value: IMemberDetails[];
 }
 
 const onRejected = (error: AxiosError) => {
@@ -19,13 +19,15 @@ const onRejected = (error: AxiosError) => {
 
 axios.interceptors.response.use((response) => response, onRejected);
 
-export const getMemberDetails = async (): Promise<MemberDetails[]> => {
+export const getMemberDetails = async (): Promise<IMemberDetails[]> => {
   const aadBase = config.aad.baseUrl;
   const groupIds = config.aad.groupId.includes(',') ? config.aad.groupId.split(',') : [config.aad.groupId];
+  const membersToRequest = config.aad.membersToRequest;
+
   const accessToken = await getToken();
 
   const promiseArray = groupIds.map(async (groupId) => {
-    const requestUrl = new URL(`/v1.0/groups/${groupId.trim()}/members`, aadBase).href;
+    const requestUrl = new URL(`/v1.0/groups/${groupId.trim()}/members?$top=${membersToRequest}`, aadBase).href;
 
     logger.info(`Trying to get aad member list for group: ${groupId.trim()}`);
 
@@ -38,14 +40,24 @@ export const getMemberDetails = async (): Promise<MemberDetails[]> => {
 
   const results = await Promise.allSettled(promiseArray);
 
-  const memberDetails = results.reduce((acc, result) => {
+  let memberDetails = results.reduce((acc, result) => {
     if (result.status === 'fulfilled') {
       acc = [...acc, ...result.value];
     } else {
       logger.error(`Error getting member details: ${result.reason}`);
     }
     return acc;
-  }, [] as MemberDetails[]);
+  }, [] as IMemberDetails[]);
 
-  return memberDetails;
+  // filter the members by type if a type is specified
+  if (config.aad.filterGroupToUsersOnly) {
+    memberDetails = memberDetails.filter((member) => member['@odata.type'] === MemberType.User);
+  } else {
+    // ensure we only return members we can actually use
+    //  they need an id and either a mail or a userPrincipalName
+    memberDetails = memberDetails.filter((member) => member.id && (member.mail || member.userPrincipalName));
+  }
+
+  // return the unique members by id
+  return memberDetails.filter((member, index, self) => index === self.findIndex((m) => m.id === member.id));
 };

@@ -1,5 +1,6 @@
 import config from '../../src/config';
 import { getDynamoMembers } from '../../src/dynamo/getDynamoRecords';
+import { ResourceType } from '../../src/dynamo/IDynamoRecord';
 
 // has to be 'var' as jest "hoists" execution behind the scenes and let/const cause errors
 /* tslint:disable */
@@ -12,16 +13,16 @@ jest.mock('aws-sdk', () => {
     promise: jest.fn().mockResolvedValue({
       Items: [
         {
-          resourceType: { S: 'USER' },
-          resourceKey: { S: 's@test.com' },
+          resourceType: { S: ResourceType.User },
+          resourceKey: { S: '6adbf131-c6c2-4bc6-b1e9-b62f812bed29' },
           name: { S: 'test user' },
-          staffId: { S: '6adbf131-c6c2-4bc6-b1e9-b62f812bed29' },
+          email: { S: 'testUser@example.com' },
         },
         {
-          resourceType: { S: 'USER' },
-          resourceKey: { S: 's2@test.com' },
+          resourceType: { S: ResourceType.User },
+          resourceKey: { S: '7d9e8e38-78d5-46ad-9fd0-6adad882161b' },
           name: { S: 'test user 2' },
-          staffId: { S: '7d9e8e38-78d5-46ad-9fd0-6adad882161b' },
+          email: { S: 'testUser2@example.com' },
         },
       ],
     } as AWS.DynamoDB.DocumentClient.QueryOutput),
@@ -57,7 +58,7 @@ describe('getDynamoMembers', () => {
       TableName: 'testTable',
       KeyConditionExpression: 'resourceType = :type',
       ExpressionAttributeValues: {
-        ':type': 'USER',
+        ':type': ResourceType.User,
       },
     } as AWS.DynamoDB.DocumentClient.QueryInput);
   });
