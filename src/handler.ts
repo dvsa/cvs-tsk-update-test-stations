@@ -1,8 +1,8 @@
 import 'source-map-support/register';
 import * as AWS from 'aws-sdk';
 import logger from './observability/logger';
-import MemberDetails from './aad/MemberDetails';
-import IDynamoRecord from './dynamo/IDynamoRecord';
+import IMemberDetails from './aad/IMemberDetails';
+import IDynamoRecord, { ResourceType } from './dynamo/IDynamoRecord';
 import { getMemberDetails } from './aad/getMemberDetails';
 import { getDynamoMembers } from './dynamo/getDynamoRecords';
 import config from './config';
@@ -16,51 +16,58 @@ logger.info(
 const client = new AWS.DynamoDB.DocumentClient();
 
 const handler = async (): Promise<void> => {
-  logger.debug("Function triggered'.");
-
+  logger.info('Function triggered, getting member details...');
   const activeList = await getMemberDetails();
+
+  logger.info(`Found ${activeList.length} active members, getting dynamo records...`);
   const dynamoList = await getDynamoMembers();
 
+  logger.info(`Found ${dynamoList.length} existing dynamo records, generating and executing...`);
   const stmts = await Promise.allSettled(
     generateStatements(activeList, dynamoList).map((stmt) => client.put(stmt).promise()),
   );
 
   stmts.filter((r) => r.status === 'rejected').map((r) => logger.error((<PromiseRejectedResult>r).reason));
+
+  logger.info('Done');
 };
 
 function generateStatements(
-  activeMembers: MemberDetails[],
+  activeMembers: IMemberDetails[],
   dynamoRecords: IDynamoRecord[],
 ): AWS.DynamoDB.DocumentClient.PutItemInput[] {
   const memberMap = activeMembers.map(
     (am) =>
       <AWS.DynamoDB.DocumentClient.PutItemInput>{
         TableName: config.aws.dynamoTable,
-        Item: {
-          resourceType: 'USER',
-          resourceKey: am.userPrincipalName,
+        Item: <IDynamoRecord>{
+          resourceType: ResourceType.User,
+          resourceKey: am.id,
           name: am.displayName,
-          staffId: am.staffId,
+          email: am.mail || am.userPrincipalName,
         },
       },
   );
 
+  // for our existing records, we want to set a TTL of 1 week
+  //  if the user is not in the active list
   const SECONDS_IN_AN_HOUR = 60 * 60;
-  const days = 7;
+  const HOURS_IN_A_DAY = 24;
+  const DAYS_IN_A_WEEK = 7;
   const secondsSinceEpoch = Math.round(Date.now() / 1000);
-  const expirationTime = secondsSinceEpoch + 24 * SECONDS_IN_AN_HOUR * days;
+  const expirationTime = secondsSinceEpoch + HOURS_IN_A_DAY * SECONDS_IN_AN_HOUR * DAYS_IN_A_WEEK;
 
   const drMap = dynamoRecords
-    .filter((dr) => !activeMembers.some((am) => am.userPrincipalName === dr.email))
+    .filter((dr) => !activeMembers.some((am) => am.id === dr.resourceKey))
     .map(
       (dr) =>
         <AWS.DynamoDB.DocumentClient.PutItemInput>{
           TableName: config.aws.dynamoTable,
-          Item: {
-            resourceType: 'USER',
-            resourceKey: dr.email,
+          Item: <IDynamoRecord>{
+            resourceType: dr.resourceType,
+            resourceKey: dr.resourceKey,
             name: dr.name,
-            staffId: dr.staffId,
+            email: dr.email,
             ttl: expirationTime,
           },
         },

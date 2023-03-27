@@ -1,5 +1,5 @@
-import MemberDetails from '../../src/aad/MemberDetails';
-import IDynamoRecord from '../../src/dynamo/IDynamoRecord';
+import IMemberDetails, { MemberType } from '../../src/aad/IMemberDetails';
+import IDynamoRecord, { ResourceType } from '../../src/dynamo/IDynamoRecord';
 import { handler } from '../../src/handler';
 
 // has to be 'var' as jest "hoists" execution behind the scenes and let/const cause errors
@@ -14,13 +14,15 @@ var emptyDynamoDetails = true;
 jest.mock('../../src/aad/getMemberDetails', () => {
   mockMemberDetails = jest.fn().mockResolvedValue(
     emptyMemberDetails
-      ? new Array<MemberDetails>()
+      ? new Array<IMemberDetails>()
       : [
           {
+            '@odata.type': MemberType.User,
+            id: '5afcf0b5-fb7f-4b83-98cc-851a8b27025c',
             displayName: 'Test User',
-            userPrincipalName: 'test@email.com',
-            staffId: '5afcf0b5-fb7f-4b83-98cc-851a8b27025c',
-          } as MemberDetails,
+            mail: 'test@example.com',
+            userPrincipalName: 'test@example.com',
+          } as IMemberDetails,
         ],
   );
   return { getMemberDetails: mockMemberDetails };
@@ -32,9 +34,10 @@ jest.mock('../../src/dynamo/getDynamoRecords', () => {
       ? new Array<IDynamoRecord>()
       : [
           {
+            resourceType: ResourceType.User,
+            resourceKey: '932a98cb-8946-4796-8291-c7bcf4badb50',
             email: 'deleted@email.com',
             name: 'Deleted User',
-            staffId: '932a98cb-8946-4796-8291-c7bcf4badb50',
           } as IDynamoRecord,
         ],
   );
@@ -80,10 +83,10 @@ describe('Handler', () => {
     expect(mockDynamoPut).toBeCalledWith({
       TableName: '',
       Item: {
-        resourceType: 'USER',
-        resourceKey: 'test@email.com',
+        resourceType: ResourceType.User,
+        resourceKey: '5afcf0b5-fb7f-4b83-98cc-851a8b27025c',
         name: 'Test User',
-        staffId: '5afcf0b5-fb7f-4b83-98cc-851a8b27025c',
+        email: 'test@example.com',
       },
     });
   });
@@ -91,14 +94,14 @@ describe('Handler', () => {
   it('should run a dynamo put with a ttl for an inactive record', async () => {
     emptyDynamoDetails = false;
     await handler();
-    expect(mockDynamoPut).toBeCalledWith(
+    expect(mockDynamoPut).toHaveBeenCalledWith(
       expect.objectContaining({
         TableName: '',
         Item: {
-          resourceType: 'USER',
-          resourceKey: 'deleted@email.com',
+          resourceType: ResourceType.User,
+          resourceKey: '932a98cb-8946-4796-8291-c7bcf4badb50',
           name: 'Deleted User',
-          staffId: '932a98cb-8946-4796-8291-c7bcf4badb50',
+          email: 'deleted@email.com',
           ttl: expect.any(Number) as number,
         },
       }),

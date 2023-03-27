@@ -1,6 +1,6 @@
 import * as AWS from 'aws-sdk';
 import config from '../config';
-import IDynamoRecord from './IDynamoRecord';
+import IDynamoRecord, { ResourceType } from './IDynamoRecord';
 
 const dynamo = new AWS.DynamoDB.DocumentClient();
 
@@ -10,7 +10,7 @@ export const getDynamoMembers: () => Promise<IDynamoRecord[]> = async () => {
       TableName: config.aws.dynamoTable,
       KeyConditionExpression: 'resourceType = :type',
       ExpressionAttributeValues: {
-        ':type': 'USER',
+        ':type': ResourceType.User,
       },
     } as AWS.DynamoDB.DocumentClient.QueryInput)
     .promise();
