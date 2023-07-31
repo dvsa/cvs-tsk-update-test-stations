@@ -23,7 +23,7 @@ The solution design can be found in [Confluence](https://wiki.dvsacloud.uk/displ
 
 ## Dependencies
 
-The project runs on node 14.x with typescript. For further details about project dependencies, please refer to the `package.json` file.
+The project runs on node 18.x with typescript. For further details about project dependencies, please refer to the `package.json` file.
 [nvm](https://github.com/nvm-sh/nvm/blob/master/README.md) is used to managed node versions and configuration explicitly done per project using an `.npmrc` file.
 
 ## Running the project
