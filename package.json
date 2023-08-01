@@ -4,7 +4,7 @@
   "description": "",
   "main": "src/handler.ts",
   "engines": {
-    "node": "18.*",
+    "node": "14.*",
     "npm": "6.*"
   },
   "husky": {
@@ -46,11 +46,11 @@
   "dependencies": {
     "@azure/msal-node": "1.14.6",
     "aws-lambda": "1.0.6",
-    "aws-sdk": "2.1354.0",
+    "aws-sdk": "2.1029.0",
     "axios": "0.25.0",
     "axios-observable": "1.3.0",
     "dateformat": "4.6.3",
-    "knex": "2.4.0",
+    "knex": "0.95.14",
     "minimatch": "3.0.5",
     "p-retry": "4.6.1",
     "rxjs": "7.5.2",
