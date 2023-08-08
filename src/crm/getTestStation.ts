@@ -102,8 +102,12 @@ export const getTestStations = async (date: Date): Promise<DynamoTestStation[]> 
 
   mappedTestStations.forEach((station) => {
     testStationEmails.forEach((connection) => {
-      if (connection.record1id_account.accountid === station.testStationId) {
-        station.testStationEmails.push(connection.record2id_contact.emailaddress1);
+      // find the email addresses (connections) for the current test station
+      if (connection?.record1id_account?.accountid === station.testStationId) {
+        // is there an email address?
+        if (connection?.record2id_contact?.emailaddress1) {
+          station.testStationEmails.push(connection.record2id_contact.emailaddress1);
+        }
       }
     });
   });
