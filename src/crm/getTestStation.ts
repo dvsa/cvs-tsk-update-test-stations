@@ -1,11 +1,11 @@
-import pRetry from 'p-retry';
 import dateFormat from 'dateformat';
-import logger from '../observability/logger';
-import { getReportRecipientEmails, getModifiedTestStations } from './dynamicsWebApi';
-import { DynamoTestStation } from './DynamoTestStation';
+import pRetry from 'p-retry';
 import config from '../config';
-import { DynamicsTestStation } from './DynamicsTestStation';
+import logger from '../observability/logger';
 import { DynamicsConnection } from './DynamicsConnection';
+import { DynamicsTestStation } from './DynamicsTestStation';
+import { DynamoTestStation } from './DynamoTestStation';
+import { getModifiedTestStations, getReportRecipientEmails } from './dynamicsWebApi';
 
 const TestStationType = new Map<number, string>([
   [147160000, 'atf'],
@@ -82,19 +82,21 @@ export const getTestStations = async (date: Date): Promise<DynamoTestStation[]> 
 
   const testStationAccounts: DynamicsTestStation[] = await pRetry(runAccounts, {
     onFailedAttempt: (error) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/restrict-template-expressions
       logger.info(`Attempt ${error.attemptNumber} failed with "${error.message}".`);
     },
     retries: Number(config.crm.maxRetryAttempts),
     minTimeout: Number(config.crm.scalingDuration),
-  });
+  } as unknown);
 
   const testStationEmails: DynamicsConnection[] = await pRetry(runEmails, {
     onFailedAttempt: (error) => {
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-unsafe-member-access
       logger.info(`Attempt ${error.attemptNumber} failed with "${error.message}".`);
     },
     retries: Number(config.crm.maxRetryAttempts),
     minTimeout: Number(config.crm.scalingDuration),
-  });
+  } as unknown);
 
   const mappedTestStations = testStationAccounts
     .map((entry) => mapToDynamoTestStation(entry))

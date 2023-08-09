@@ -8,6 +8,7 @@ const logFormat = printf((info) => {
   if (info.stack) {
     return `${info.level}: ${info.stack as string}`;
   }
+  // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
   return `${info.level}: ${info.message}`;
 });
 
