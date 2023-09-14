@@ -8,7 +8,7 @@ Designed to be invoked by a timer every night to pick up the previous days chang
 
 ## Dependencies
 
-The project runs on node 16.x with typescript. For further details about project dependencies, please refer to the `package.json` file.
+The project runs on node 18.x with typescript. For further details about project dependencies, please refer to the `package.json` file.
 [nvm](https://github.com/nvm-sh/nvm/blob/master/README.md) is used to managed node versions and configuration explicitly done per project using an `.npmrc` file.
 
 ## Running the project
@@ -151,12 +151,14 @@ The code uses [eslint](https://eslint.org/docs/user-guide/getting-started), [typ
 SonarQube is available locally, please follow the instructions below if you wish to run the service locally (docker is the preferred approach):
 
 - _Docker_:
+
   - Run `docker run -d -p 9000:9000 --name sonarqube sonarqube:latest`
   - The SonarQube container won't start automatically with your PC. To start it run `docker start sonarqube`
   - Login with admin/admin - http://localhost:9000 and create a Project with name and key found in `./sonar-project.properties`. There you'll also find instructions for creating and configuring an authentication token.
   - Run the analysis with `npm run sonar-scanner`
 
 - _Brew_:
+
   - Install SonarQube using brew
   - Change `sonar.host.url` to point to localhost, by default, sonar runs on `http://localhost:9000`
   - run the sonar server `sonar start`, then perform your analysis `npm run sonar-scanner`
