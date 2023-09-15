@@ -37,6 +37,7 @@ node_modules/**
 .nyc_output/**
 coverage/**
 test-report.xml
+reports/**
 
 #sonarqube
 .scannerwork/**
