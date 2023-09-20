@@ -1,8 +1,8 @@
 import axios, { AxiosError } from 'axios';
 import { URL } from 'url';
+import config from '../config';
 import logger from '../observability/logger';
 import IMemberDetails, { MemberType } from './IMemberDetails';
-import config from '../config';
 import getToken from './getToken';
 
 interface MemberList {
@@ -35,6 +35,7 @@ export const getMemberDetails = async (): Promise<IMemberDetails[]> => {
     axios.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
 
     const response = await axios.get<MemberList>(requestUrl, { headers: { Authorization: `Bearer ${accessToken}` } });
+    console.log(JSON.stringify(response));
     return response.data.value;
   });
 
