@@ -35,7 +35,7 @@ export const getMemberDetails = async (): Promise<IMemberDetails[]> => {
     axios.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
 
     const response = await axios.get<MemberList>(requestUrl, { headers: { Authorization: `Bearer ${accessToken}` } });
-    console.log(JSON.stringify(response));
+    console.log(response.data.value);
     return response.data.value;
   });
 
