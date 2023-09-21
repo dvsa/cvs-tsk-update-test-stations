@@ -27,16 +27,19 @@ export const getMemberDetails = async (): Promise<IMemberDetails[]> => {
   const accessToken = await getToken();
 
   const promiseArray = groupIds.map(async (groupId) => {
-    const requestUrl = new URL(`/v1.0/groups/${groupId.trim()}/members?$top=${membersToRequest}`, aadBase).href;
+    const requestUrl = new URL(
+      `/v1.0/groups/${groupId.trim()}/transitivemembers/microsoft.graph.user?$count=true&$filter=accountEnabled eq true`,
+      aadBase,
+    ).href;
 
     logger.info(`Trying to get aad member list for group: ${groupId.trim()}`);
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     axios.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
 
-    console.log(accessToken);
-
-    const response = await axios.get<MemberList>(requestUrl, { headers: { Authorization: `Bearer ${accessToken}` } });
+    const response = await axios.get<MemberList>(requestUrl, {
+      headers: { Authorization: `Bearer ${accessToken}`, ConsistencyLevel: 'eventual' },
+    });
     console.log(response.data.value);
     return response.data.value;
   });
