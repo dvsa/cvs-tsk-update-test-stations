@@ -1,7 +1,7 @@
 import { Axios, AxiosError, AxiosRequestHeaders } from 'axios';
-import config from '../../src/config';
-import { getMemberDetails } from '../../src/aad/getMemberDetails';
 import IMemberDetails, { MemberType } from '../../src/aad/IMemberDetails';
+import { getMemberDetails } from '../../src/aad/getMemberDetails';
+import config from '../../src/config';
 
 // has to be 'var' as jest "hoists" execution behind the scenes and let/const cause errors
 /* tslint:disable */
@@ -85,18 +85,24 @@ describe('getMemberDetails', () => {
 
   it('should get details from the correct url', async () => {
     await getMemberDetails();
-    expect(mockAxiosGet).toBeCalledWith('https://test/v1.0/groups/testGroup/members?$top=999', {
-      headers: { Authorization: 'Bearer testToken' },
-    });
+    expect(mockAxiosGet).toBeCalledWith(
+      'https://test/v1.0/groups/testGroup/transitivemembers/microsoft.graph.user?$count=true&$filter=accountEnabled%20eq%20true',
+      {
+        headers: { Authorization: 'Bearer testToken', ConsistencyLevel: 'eventual' },
+      },
+    );
   });
 
   it('should get details from the correct urls if multiple groups given', async () => {
     config.aad.groupId = 'testGroup1, testGroup2, testGroup3, testGroup4, testGroup5, testGroup6';
     await getMemberDetails();
     expect(mockAxiosGet).toBeCalledTimes(6);
-    expect(mockAxiosGet).toHaveBeenLastCalledWith('https://test/v1.0/groups/testGroup6/members?$top=999', {
-      headers: { Authorization: 'Bearer testToken' },
-    });
+    expect(mockAxiosGet).toHaveBeenLastCalledWith(
+      'https://test/v1.0/groups/testGroup6/transitivemembers/microsoft.graph.user?$count=true&$filter=accountEnabled%20eq%20true',
+      {
+        headers: { Authorization: 'Bearer testToken', ConsistencyLevel: 'eventual' },
+      },
+    );
   });
 
   it('should return a distinct list of members by id if the same member is in multiple groups', async () => {
