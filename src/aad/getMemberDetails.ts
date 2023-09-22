@@ -22,7 +22,6 @@ axios.interceptors.response.use((response) => response, onRejected);
 export const getMemberDetails = async (): Promise<IMemberDetails[]> => {
   const aadBase = config.aad.baseUrl;
   const groupIds = config.aad.groupId.includes(',') ? config.aad.groupId.split(',') : [config.aad.groupId];
-  // const membersToRequest = config.aad.membersToRequest;
 
   const accessToken = await getToken();
 
@@ -40,7 +39,6 @@ export const getMemberDetails = async (): Promise<IMemberDetails[]> => {
     const response = await axios.get<MemberList>(requestUrl, {
       headers: { Authorization: `Bearer ${accessToken}`, ConsistencyLevel: 'eventual' },
     });
-    console.log(response.data.value);
     return response.data.value;
   });
 
