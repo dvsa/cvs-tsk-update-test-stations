@@ -86,7 +86,7 @@ describe('getMemberDetails', () => {
   it('should get details from the correct url', async () => {
     await getMemberDetails();
     expect(mockAxiosGet).toBeCalledWith(
-      'https://test/v1.0/groups/testGroup/transitivemembers/microsoft.graph.user?$count=true&$filter=accountEnabled%20eq%20true',
+      'https://test/v1.0/groups/testGroup/members/microsoft.graph.user?$count=true&$filter=accountEnabled%20eq%20true',
       {
         headers: { Authorization: 'Bearer testToken', ConsistencyLevel: 'eventual' },
       },
@@ -98,7 +98,7 @@ describe('getMemberDetails', () => {
     await getMemberDetails();
     expect(mockAxiosGet).toBeCalledTimes(6);
     expect(mockAxiosGet).toHaveBeenLastCalledWith(
-      'https://test/v1.0/groups/testGroup6/transitivemembers/microsoft.graph.user?$count=true&$filter=accountEnabled%20eq%20true',
+      'https://test/v1.0/groups/testGroup6/members/microsoft.graph.user?$count=true&$filter=accountEnabled%20eq%20true',
       {
         headers: { Authorization: 'Bearer testToken', ConsistencyLevel: 'eventual' },
       },
