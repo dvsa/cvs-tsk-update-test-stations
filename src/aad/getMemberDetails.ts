@@ -1,8 +1,8 @@
 import axios, { AxiosError } from 'axios';
 import { URL } from 'url';
+import config from '../config';
 import logger from '../observability/logger';
 import IMemberDetails, { MemberType } from './IMemberDetails';
-import config from '../config';
 import getToken from './getToken';
 
 interface MemberList {
@@ -22,19 +22,23 @@ axios.interceptors.response.use((response) => response, onRejected);
 export const getMemberDetails = async (): Promise<IMemberDetails[]> => {
   const aadBase = config.aad.baseUrl;
   const groupIds = config.aad.groupId.includes(',') ? config.aad.groupId.split(',') : [config.aad.groupId];
-  const membersToRequest = config.aad.membersToRequest;
 
   const accessToken = await getToken();
 
   const promiseArray = groupIds.map(async (groupId) => {
-    const requestUrl = new URL(`/v1.0/groups/${groupId.trim()}/members?$top=${membersToRequest}`, aadBase).href;
+    const requestUrl = new URL(
+      `/v1.0/groups/${groupId.trim()}/members?$count=true&$filter=accountEnabled eq true`,
+      aadBase,
+    ).href;
 
     logger.info(`Trying to get aad member list for group: ${groupId.trim()}`);
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     axios.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
 
-    const response = await axios.get<MemberList>(requestUrl, { headers: { Authorization: `Bearer ${accessToken}` } });
+    const response = await axios.get<MemberList>(requestUrl, {
+      headers: { Authorization: `Bearer ${accessToken}`, ConsistencyLevel: 'eventual' },
+    });
     return response.data.value;
   });
 
