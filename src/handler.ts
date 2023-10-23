@@ -22,8 +22,6 @@ const handler = async (): Promise<void> => {
   logger.info(`Found ${activeList.length} active members, getting dynamo records...`);
   const dynamoList = await getDynamoMembers();
 
-  logger.error(JSON.stringify(dynamoList));
-
   logger.info(`Found ${dynamoList.length} existing dynamo records, generating and executing...`);
   const stmts = await Promise.allSettled(
     generateStatements(activeList, dynamoList).map((stmt) => client.put(stmt).promise()),
