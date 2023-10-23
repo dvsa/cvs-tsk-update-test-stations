@@ -1,11 +1,11 @@
-import 'source-map-support/register';
 import * as AWS from 'aws-sdk';
-import logger from './observability/logger';
+import 'source-map-support/register';
 import IMemberDetails from './aad/IMemberDetails';
-import IDynamoRecord, { ResourceType } from './dynamo/IDynamoRecord';
 import { getMemberDetails } from './aad/getMemberDetails';
-import { getDynamoMembers } from './dynamo/getDynamoRecords';
 import config from './config';
+import IDynamoRecord, { ResourceType } from './dynamo/IDynamoRecord';
+import { getDynamoMembers } from './dynamo/getDynamoRecords';
+import logger from './observability/logger';
 
 const { NODE_ENV, SERVICE, AWS_PROVIDER_REGION, AWS_PROVIDER_STAGE } = process.env;
 
@@ -27,7 +27,12 @@ const handler = async (): Promise<void> => {
     generateStatements(activeList, dynamoList).map((stmt) => client.put(stmt).promise()),
   );
 
-  stmts.filter((r) => r.status === 'rejected').map((r) => logger.error((<PromiseRejectedResult>r).reason));
+  stmts
+    .filter((r) => r.status === 'rejected')
+    .map((r) => {
+      logger.error((<PromiseRejectedResult>r).reason);
+      logger.error(JSON.stringify(r));
+    });
 
   logger.info('Done');
 };
