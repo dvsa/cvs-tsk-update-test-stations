@@ -1,5 +1,6 @@
 import * as AWS from 'aws-sdk';
 import config from '../config';
+import logger from '../observability/logger';
 import IDynamoRecord, { ResourceType } from './IDynamoRecord';
 
 const dynamo = new AWS.DynamoDB.DocumentClient();
@@ -14,6 +15,9 @@ export const getDynamoMembers: () => Promise<IDynamoRecord[]> = async () => {
       },
     } as AWS.DynamoDB.DocumentClient.QueryInput)
     .promise();
+
+  logger.error(config.aws.dynamoTable);
+  logger.error(JSON.stringify(result));
 
   return result.Items.map((i) => AWS.DynamoDB.Converter.unmarshall(i)) as IDynamoRecord[];
 };
