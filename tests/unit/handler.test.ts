@@ -87,6 +87,7 @@ describe('Handler', () => {
         resourceKey: '5afcf0b5-fb7f-4b83-98cc-851a8b27025c',
         name: 'Test User',
         email: 'test@example.com',
+        ttl: expect.any(Number) as number,
       },
     });
   });
