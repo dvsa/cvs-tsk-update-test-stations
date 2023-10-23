@@ -26,18 +26,10 @@ const handler = async (): Promise<void> => {
 
   logger.info(`Found ${dynamoList.length} existing dynamo records, generating and executing...`);
   const stmts = await Promise.allSettled(
-    generateStatements(activeList, dynamoList).map((stmt) => {
-      logger.error(JSON.stringify(stmt));
-      client.put(stmt).promise();
-    }),
+    generateStatements(activeList, dynamoList).map((stmt) => client.put(stmt).promise()),
   );
 
-  stmts
-    .filter((r) => r.status === 'rejected')
-    .map((r) => {
-      logger.error((<PromiseRejectedResult>r).reason);
-      logger.error(JSON.stringify(r));
-    });
+  stmts.filter((r) => r.status === 'rejected').map((r) => logger.error((<PromiseRejectedResult>r).reason));
 
   logger.info('Done');
 };
