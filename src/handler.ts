@@ -36,13 +36,6 @@ function generateStatements(
   activeMembers: IMemberDetails[],
   dynamoRecords: IDynamoRecord[],
 ): AWS.DynamoDB.DocumentClient.PutItemInput[] {
-  // for our existing records, we want to set a TTL of 1 week
-  //  if the user is not in the active list
-  const SECONDS_IN_AN_HOUR = 60 * 60;
-  const HOURS_IN_A_DAY = 24;
-  const DAYS_IN_A_WEEK = 7;
-  const secondsSinceEpoch = Math.round(Date.now() / 1000);
-  const expirationTime = secondsSinceEpoch + HOURS_IN_A_DAY * SECONDS_IN_AN_HOUR * DAYS_IN_A_WEEK;
   const memberMap = activeMembers.map(
     (am) =>
       <AWS.DynamoDB.DocumentClient.PutItemInput>{
@@ -52,10 +45,17 @@ function generateStatements(
           resourceKey: am.id,
           name: am.displayName,
           email: am.mail || am.userPrincipalName,
-          ttl: expirationTime,
         },
       },
   );
+
+  // for our existing records, we want to set a TTL of 1 week
+  //  if the user is not in the active list
+  const SECONDS_IN_AN_HOUR = 60 * 60;
+  const HOURS_IN_A_DAY = 24;
+  const DAYS_IN_A_WEEK = 7;
+  const secondsSinceEpoch = Math.round(Date.now() / 1000);
+  const expirationTime = secondsSinceEpoch + HOURS_IN_A_DAY * SECONDS_IN_AN_HOUR * DAYS_IN_A_WEEK;
 
   const drMap = dynamoRecords
     .filter((dr) => !activeMembers.some((am) => am.id === dr.resourceKey))
