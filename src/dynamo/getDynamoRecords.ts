@@ -15,5 +15,5 @@ export const getDynamoMembers: () => Promise<IDynamoRecord[]> = async () => {
     } as AWS.DynamoDB.DocumentClient.QueryInput)
     .promise();
 
-  return result.Items.map((i) => AWS.DynamoDB.Converter.unmarshall(i)) as IDynamoRecord[];
+  return result.Items as IDynamoRecord[];
 };
