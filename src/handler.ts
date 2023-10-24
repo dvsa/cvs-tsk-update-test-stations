@@ -17,14 +17,14 @@ const client = new AWS.DynamoDB.DocumentClient();
 
 const handler = async (): Promise<void> => {
   logger.info('Function triggered, getting member details...');
-  const activeList = await getMemberDetails();
+  const azureList = await getMemberDetails();
 
-  logger.info(`Found ${activeList.length} active members, getting dynamo records...`);
+  logger.info(`Found ${azureList.length} active members, getting dynamo records...`);
   const dynamoList = await getDynamoMembers();
 
   logger.info(`Found ${dynamoList.length} existing dynamo records, generating and executing...`);
   const stmts = await Promise.allSettled(
-    generateStatements(activeList, dynamoList).map((stmt) => client.put(stmt).promise()),
+    generateStatements(azureList, dynamoList).map((stmt) => client.put(stmt).promise()),
   );
 
   stmts.filter((r) => r.status === 'rejected').map((r) => logger.error((<PromiseRejectedResult>r).reason));
@@ -33,10 +33,10 @@ const handler = async (): Promise<void> => {
 };
 
 function generateStatements(
-  activeMembers: IMemberDetails[],
+  azureMembers: IMemberDetails[],
   dynamoRecords: IDynamoRecord[],
 ): AWS.DynamoDB.DocumentClient.PutItemInput[] {
-  const memberMap = activeMembers.map(
+  const memberMap = azureMembers.map(
     (am) =>
       <AWS.DynamoDB.DocumentClient.PutItemInput>{
         TableName: config.aws.dynamoTable,
@@ -58,7 +58,7 @@ function generateStatements(
   const expirationTime = secondsSinceEpoch + HOURS_IN_A_DAY * SECONDS_IN_AN_HOUR * DAYS_IN_A_WEEK;
 
   const drMap = dynamoRecords
-    .filter((dr) => !activeMembers.some((am) => am.id === dr.resourceKey))
+    .filter((dr) => !azureMembers.some((am) => am.id === dr.resourceKey))
     .map(
       (dr) =>
         <AWS.DynamoDB.DocumentClient.PutItemInput>{
@@ -72,6 +72,9 @@ function generateStatements(
           },
         },
     );
+
+  logger.error(JSON.stringify(drMap));
+  logger.error(JSON.stringify(memberMap));
 
   return memberMap.concat(drMap);
 }
