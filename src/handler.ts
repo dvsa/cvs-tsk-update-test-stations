@@ -73,9 +73,6 @@ function generateStatements(
         },
     );
 
-  logger.error(JSON.stringify(drMap));
-  logger.error(JSON.stringify(memberMap));
-
   return memberMap.concat(drMap);
 }
 
