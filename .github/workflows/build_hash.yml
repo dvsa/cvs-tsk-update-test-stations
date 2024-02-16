@@ -9,7 +9,7 @@ on:
 
 jobs:
   Build:
-    uses: dvsa/cvs-github-actions/.github/workflows/build-node-hash.yaml@develop
+    uses: dvsa/cvs-github-actions/.github/workflows/build-node-hash.yaml@feature/CB2-10412
     secrets:
       CVS_MGMT_AWS_ROLE: ${{ secrets.CVS_MGMT_AWS_ROLE }}
       DVSA_AWS_REGION: ${{ secrets.DVSA_AWS_REGION }}
