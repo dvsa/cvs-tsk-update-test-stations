@@ -92,6 +92,7 @@
     "serverless-offline": "8.2.0",
     "serverless-offline-aws-eventbridge": "1.6.5",
     "serverless-plugin-typescript": "2.1.0",
+    "sonar-scanner": "3.1.0",
     "supertest": "6.0.1",
     "ts-jest": "27.0.7",
     "ts-loader": "8.0.14",
