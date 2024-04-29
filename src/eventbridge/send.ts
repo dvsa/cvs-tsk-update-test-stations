@@ -10,7 +10,7 @@ const eventBridge = new EventBridgeClient();
 const sendModifiedTestStations = async (testStations: DynamoTestStation[]): Promise<SendResponse> => {
   logger.info('sendModifiedTestStations starting');
   logger.info(
-    `${testStations.length} test ${testStations.length === 1 ? 'station' : 'stations'} ready to send to eventBridge.`,
+    `${testStations.length} test ${testStations.length === 1 ? 'station' : 'stations'} ready to send to eventbridge.`,
   );
 
   const sendResponse: SendResponse = {
@@ -20,7 +20,7 @@ const sendModifiedTestStations = async (testStations: DynamoTestStation[]): Prom
 
   for (let i = 0; i < testStations.length; i++) {
     // eslint-disable-next-line security/detect-object-injection
-    logger.info(`sending test station id: ${testStations[i]?.testStationId} to eventBridge...`);
+    logger.info(`sending test station id: ${testStations[i]?.testStationId} to eventbridge...`);
 
     try {
       const entry: EventEntry = {
