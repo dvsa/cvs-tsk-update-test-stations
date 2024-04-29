@@ -1,4 +1,4 @@
-import { EventBridge } from 'aws-sdk';
+import { EventBridgeClient, PutEventsCommand } from '@aws-sdk/client-eventbridge';
 import { EventEntry } from './EventEntry';
 import { Entries } from './Entries';
 import { SendResponse } from './SendResponse';
@@ -6,11 +6,11 @@ import logger from '../observability/logger';
 import { DynamoTestStation } from '../crm/DynamoTestStation';
 import config from '../config';
 
-const eventbridge = new EventBridge();
+const eventBridge = new EventBridgeClient();
 const sendModifiedTestStations = async (testStations: DynamoTestStation[]): Promise<SendResponse> => {
   logger.info('sendModifiedTestStations starting');
   logger.info(
-    `${testStations.length} test ${testStations.length === 1 ? 'station' : 'stations'} ready to send to eventbridge.`,
+    `${testStations.length} test ${testStations.length === 1 ? 'station' : 'stations'} ready to send to eventBridge.`,
   );
 
   const sendResponse: SendResponse = {
@@ -20,7 +20,7 @@ const sendModifiedTestStations = async (testStations: DynamoTestStation[]): Prom
 
   for (let i = 0; i < testStations.length; i++) {
     // eslint-disable-next-line security/detect-object-injection
-    logger.info(`sending test station id: ${testStations[i]?.testStationId} to eventbridge...`);
+    logger.info(`sending test station id: ${testStations[i]?.testStationId} to eventBridge...`);
 
     try {
       const entry: EventEntry = {
@@ -37,8 +37,9 @@ const sendModifiedTestStations = async (testStations: DynamoTestStation[]): Prom
       };
 
       logger.debug(`test station event about to be sent: ${JSON.stringify(params)}`);
+      const command = new PutEventsCommand(params);
       // eslint-disable-next-line no-await-in-loop
-      await eventbridge.putEvents(params).promise();
+      await eventBridge.send(command);
       sendResponse.SuccessCount++;
     } catch (error) {
       logger.error('', error);
