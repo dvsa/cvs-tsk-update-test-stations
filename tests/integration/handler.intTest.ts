@@ -1,29 +1,19 @@
 import axios from 'axios-observable';
 import { of } from 'rxjs';
 import MockDate from 'mockdate';
+import { mockClient } from 'aws-sdk-client-mock';
+import { GetSecretValueCommand, SecretsManagerClient } from '@aws-sdk/client-secrets-manager';
+import { EventBridgeClient, PutEventsCommand } from '@aws-sdk/client-eventbridge';
+import 'aws-sdk-client-mock-jest';
 import { handler } from '../../src/handler';
 import { MOCK_DYNAMICS_ACCOUNTS_RESPONSE } from './data/mockDynamicsAccountsResponse';
 import { MOCK_DYNAMICS_CONNECTIONS_RESPONSE } from './data/mockDynamicsConnectionsResponse';
 import { GetExpectedEvent } from './data/mockEventBridgeEvents';
 
-// mock the external resources
-// AWS
-const putEventsFn = jest.fn();
-jest.mock('aws-sdk', () => ({
-  SecretsManager: jest.fn().mockImplementation(() => ({
-    getSecretValue: jest.fn().mockImplementation(() => ({
-      promise: jest.fn().mockResolvedValue({}),
-    })),
-  })),
-  EventBridge: jest.fn().mockImplementation(() => ({
-    putEvents: jest.fn().mockImplementation((params: unknown) => {
-      putEventsFn(params); // allows us to test the event payload
-      return {
-        promise: jest.fn(),
-      };
-    }),
-  })),
-}));
+const mockSecretManager = mockClient(SecretsManagerClient);
+const mockEventBridge = mockClient(EventBridgeClient);
+mockSecretManager.on(GetSecretValueCommand).resolves({ SecretString: '123' });
+mockEventBridge.on(PutEventsCommand).resolves({});
 
 // MSAL (Azure AD) Token Authentication Request
 jest.mock('@azure/msal-node', () => ({
@@ -56,11 +46,12 @@ describe('Handler integration test', () => {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     await new Promise(process.nextTick);
 
-    expect(callback).toHaveBeenCalledWith(null, 'Data processed successfully; good: 3, bad: 0');
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    expect(callback.mock.calls[0][1]).toBe('Data processed successfully; good: 3, bad: 0');
 
-    expect(putEventsFn).toHaveBeenCalledTimes(3);
-    expect(putEventsFn).toHaveBeenNthCalledWith(1, GetExpectedEvent(1));
-    expect(putEventsFn).toHaveBeenNthCalledWith(2, GetExpectedEvent(2));
-    expect(putEventsFn).toHaveBeenNthCalledWith(3, GetExpectedEvent(3));
+    expect(mockEventBridge).toHaveReceivedCommandTimes(PutEventsCommand, 3);
+    expect(mockEventBridge).toHaveReceivedNthCommandWith(1, PutEventsCommand, GetExpectedEvent(1));
+    expect(mockEventBridge).toHaveReceivedNthCommandWith(2, PutEventsCommand, GetExpectedEvent(2));
+    expect(mockEventBridge).toHaveReceivedNthCommandWith(3, PutEventsCommand, GetExpectedEvent(3));
   });
 });
