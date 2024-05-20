@@ -53,6 +53,7 @@ export function mapToDynamoTestStation(obj: DynamicsTestStation): DynamoTestStat
     testStationPostcode: obj.address1_postalcode,
     testStationStatus: TestStationStatus.get(obj.dvsa_accountstatus),
     testStationTown: obj.address1_city,
+    testStationCountry: obj.address1_country,
     testStationType: TestStationType.get(obj.dvsa_testfacilitytype),
   };
 }
@@ -62,7 +63,7 @@ export const getTestStations = async (date: Date): Promise<DynamoTestStation[]> 
 
   const modifiedOnDate: string = dateFormat(date, 'yyyy-mm-dd');
 
-  const filteredUrl = `${ceUrl}/accounts/?$select=accountid,address1_line1,address1_line2,telephone1,dvsa_openingtimes,address1_longitude,address1_latitude,name,dvsa_premisecodes,address1_postalcode,dvsa_accountstatus,address1_city,dvsa_testfacilitytype,modifiedon&$filter=modifiedon%20ge%20${modifiedOnDate}%20and%20dvsa_accounttype%20eq%20100000000`;
+  const filteredUrl = `${ceUrl}/accounts/?$select=accountid,address1_line1,address1_line2,telephone1,dvsa_openingtimes,address1_longitude,address1_latitude,name,dvsa_premisecodes,address1_postalcode,dvsa_accountstatus,address1_city,address1_country,dvsa_testfacilitytype,modifiedon&$filter=modifiedon%20ge%20${modifiedOnDate}%20and%20dvsa_accounttype%20eq%20100000000`;
 
   const runAccounts = async (): Promise<DynamicsTestStation[]> => {
     logger.info(`Trying to get test stations informations modified since: ${modifiedOnDate}`);
