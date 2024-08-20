@@ -12,6 +12,7 @@ const TestStationType = new Map<number, string>([
   [147160001, 'gvts'],
   [147160002, 'potf'],
   [147160003, 'hq'],
+  [147160004, 'vef'],
 ]);
 
 const TestStationStatus = new Map<number, string>([
