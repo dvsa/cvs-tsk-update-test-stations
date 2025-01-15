@@ -12,6 +12,7 @@ interface DynamoTestStation {
   testStationPostcode: string;
   testStationStatus: string;
   testStationTown: string;
+  testStationCountry: string;
   testStationType: string;
 }
 
