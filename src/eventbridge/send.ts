@@ -1,4 +1,4 @@
-import { EventBridge } from 'aws-sdk';
+import { EventBridgeClient, PutEventsCommand } from '@aws-sdk/client-eventbridge';
 import { EventEntry } from './EventEntry';
 import { Entries } from './Entries';
 import { SendResponse } from './SendResponse';
@@ -6,7 +6,7 @@ import logger from '../observability/logger';
 import { DynamoTestStation } from '../crm/DynamoTestStation';
 import config from '../config';
 
-const eventbridge = new EventBridge();
+const eventBridge = new EventBridgeClient();
 const sendModifiedTestStations = async (testStations: DynamoTestStation[]): Promise<SendResponse> => {
   logger.info('sendModifiedTestStations starting');
   logger.info(
@@ -37,8 +37,9 @@ const sendModifiedTestStations = async (testStations: DynamoTestStation[]): Prom
       };
 
       logger.debug(`test station event about to be sent: ${JSON.stringify(params)}`);
+      const command = new PutEventsCommand(params);
       // eslint-disable-next-line no-await-in-loop
-      await eventbridge.putEvents(params).promise();
+      await eventBridge.send(command);
       sendResponse.SuccessCount++;
     } catch (error) {
       logger.error('', error);
