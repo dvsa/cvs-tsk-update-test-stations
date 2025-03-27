@@ -188,6 +188,7 @@ const MOCK_BAD_ACCOUNTS_DATA: DynamicsTestStation = {
   address1_postalcode: 'string',
   dvsa_accountstatus: 147160001,
   address1_city: 'string',
+  address1_country: 'string',
   dvsa_testfacilitytype: 1471600,
   modifiedon: '',
 };
@@ -265,7 +266,7 @@ describe('getTestStation', () => {
     config.crm.ceBaseUrl = 'http://testapi';
     await getTestStations(new Date('2020-10-21'));
     expect(spy).toHaveBeenCalledWith(
-      'http://testapi/accounts/?$select=accountid,address1_line1,address1_line2,telephone1,dvsa_openingtimes,address1_longitude,address1_latitude,name,dvsa_premisecodes,address1_postalcode,dvsa_accountstatus,address1_city,dvsa_testfacilitytype,modifiedon&$filter=modifiedon%20ge%202020-10-21%20and%20dvsa_accounttype%20eq%20100000000',
+      'http://testapi/accounts/?$select=accountid,address1_line1,address1_line2,telephone1,dvsa_openingtimes,address1_longitude,address1_latitude,name,dvsa_premisecodes,address1_postalcode,dvsa_accountstatus,address1_city,address1_country,dvsa_testfacilitytype,modifiedon&$filter=modifiedon%20ge%202020-10-21%20and%20dvsa_accounttype%20eq%20100000000',
     );
   });
 

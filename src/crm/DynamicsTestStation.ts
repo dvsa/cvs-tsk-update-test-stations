@@ -14,6 +14,7 @@ interface DynamicsTestStation {
   address1_postalcode: string;
   dvsa_accountstatus: number;
   address1_city: string;
+  address1_country: string;
   dvsa_testfacilitytype: number;
   modifiedon: string;
 }
