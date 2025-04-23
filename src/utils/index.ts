@@ -1,10 +1,14 @@
-import { SecretsManager } from 'aws-sdk';
+import { GetSecretValueCommand, SecretsManagerClient } from '@aws-sdk/client-secrets-manager';
 import logger from '../observability/logger';
 
 const getSecret = async (secretName: string): Promise<string> => {
   logger.debug('getSecret starting.');
-  const secretsManager = new SecretsManager();
-  const secretValue = await secretsManager.getSecretValue({ SecretId: secretName }).promise();
+  const secretsManager = new SecretsManagerClient();
+  const secretValue = await secretsManager.send(
+    new GetSecretValueCommand({
+      SecretId: secretName,
+    }),
+  );
   logger.debug('getSecret finishing.');
   return secretValue.SecretString;
 };
